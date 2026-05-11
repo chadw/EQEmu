@@ -4826,6 +4826,8 @@ bool Mob::HateSummon() {
 		return false;
 
 	int summon_level = GetSpecialAbility(SpecialAbility::Summon);
+	int times_summoned;
+
 	if(summon_level == 1 || summon_level == 2) {
 		if(!GetTarget()) {
 			return false;
@@ -4844,15 +4846,27 @@ bool Mob::HateSummon() {
 
 	// now validate the timer
 	int summon_timer_duration = GetSpecialAbilityParam(SpecialAbility::Summon, 0);
-	summon_timer_duration = summon_timer_duration > 0 ? summon_timer_duration : 6000;
+	summon_timer_duration = summon_timer_duration > RuleI(NPC, NPCSummonTimer) ? summon_timer_duration : RuleI(NPC, NPCSummonTimer);
 	Timer *timer = GetSpecialAbilityTimer(SpecialAbility::Summon);
 	if (!timer)
 	{
+		if (RuleB(NPC, SummonTimerScaling)) {
+			times_summoned++;
+		}
 		StartSpecialAbilityTimer(SpecialAbility::Summon, summon_timer_duration);
 	} else {
 		if(!timer->Check())
 			return false;
 
+		if (RuleB(NPC, SummonTimerScaling)) {
+			if (timer && times_summoned >= 1) {
+				times_summoned++;
+				summon_timer_duration += summon_timer_duration * times_summoned;
+			}
+			if (summon_timer_duration >= RuleI(NPC, MaximumSummonTimerMs)) {
+				summon_timer_duration = RuleI(NPC, MaximumSummonTimerMs);
+			}
+		}
 		timer->Start(summon_timer_duration);
 	}
 
@@ -4860,13 +4874,22 @@ bool Mob::HateSummon() {
 	SetTarget(GetHateTop());
 	if(target)
 	{
+
+		if (RuleI(Combat, SummonImmunitySeconds) && target->IsClient()) {
+			auto si_timer = target->CastToClient()->GetSummonImmunityTimer();
+			if (si_timer->GetDuration() && !si_timer->Check(false)) {
+				return false;
+			}
+			si_timer->Start(RuleI(Combat, SummonImmunitySeconds) * 1000);
+		}
+
 		if(summon_level == 1) {
 			entity_list.MessageClose(this, true, 500, Chat::Say, "%s says 'You will not evade me, %s!' ", GetCleanName(), target->GetCleanName() );
 
 			float summoner_zoff = GetZOffset();
 			float summoned_zoff = target->GetZOffset();
 			auto new_pos = m_Position;
-			new_pos.z -= (summoner_zoff - summoned_zoff);
+			//new_pos.z -= (summoner_zoff - summoned_zoff);
 			float angle = new_pos.w - target->GetHeading();
 			new_pos.w = target->GetHeading();
 

@@ -669,6 +669,8 @@ RULE_INT(Combat, KickBaseDamage, 3, "Kick base damage, default is 3")
 RULE_INT(Combat, RoundKickBaseDamage, 5, "Round Kick base damage, default is 5")
 RULE_INT(Combat, ThrowingBaseDamage, 0, "Throwing base damage, default is 0")
 RULE_INT(Combat, TigerClawBaseDamage, 4, "Tiger Claw base damage, default is 4")
+/* Lazarus */
+RULE_INT(Combat, SummonImmunitySeconds, 0, "Seconds to make players immune to being summoned after being summoned; useful to prevent ping-pong summons")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(NPC)
@@ -706,6 +708,10 @@ RULE_BOOL(NPC, NPCIgnoreLevelBasedHasteCaps, false, "Ignores hard coded level ba
 RULE_INT(NPC, NPCHasteCap, 150, "Haste cap for non-v3(over haste) haste")
 RULE_INT(NPC, NPCHastev3Cap, 25, "Haste cap for v3(over haste) haste")
 RULE_STRING(NPC, ExcludedFaceTargetRaces, "52,72,73,141,233,328,329,372,376,377,378,379,380,381,382,383,404,422,423,424,425,426,428,429,445,449,460,462,463,500,501,502,503,504,505,506,507,508,509,510,511,513,514,515,516,533,534,535,536,537,538,539,540,541,542,543,544,545,546,550,551,552,553,554,555,556,557,567,573,577,586,589,590,591,592,593,595,596,599,601,616,619,621,628,629,630,633,634,635,636,665,683,684,685,691,692,693,694,702,703,705,706,707,710,711,714,720,2250,2254", "Race IDs excluded from facing target when hailed")
+/* Lazarus */
+RULE_BOOL(NPC, SummonTimerScaling, false, "Enable to allow SummonTimer to scale to the maximum value defined by Maximum Summon Timer")
+RULE_INT(NPC, MaximumSummonTimerMs, 30000, "Maximum Summon Timeout for mobs to re-summon a player")
+RULE_INT(NPC, NPCSummonTimer, 6000, "Default Summon Timer for NPCs")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(Aggro)
