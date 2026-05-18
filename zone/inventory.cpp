@@ -1088,6 +1088,77 @@ void Client::PutLootInInventory(int16 slot_id, const EQ::ItemInstance &inst, Loo
 
 	EvolvingItemsManager::Instance()->DoLootChecks(CharacterID(), slot_id, inst);
 
+	int16 parent_slot = EQ::InventoryProfile::CalcSlotId(slot_id);
+	if (parent_slot != INVALID_INDEX) {
+		EQ::ItemInstance* parent_inst = m_inv.GetItem(parent_slot);
+		if (parent_inst && parent_inst->IsClassBag()) {
+			if (!EQ::InventoryProfile::CanItemFitInContainer(inst.GetItem(), parent_inst->GetItem())) {
+				int16 alt_slot = m_inv.FindFirstFreeSlotThatFitsItem(inst.GetItem());
+				if (alt_slot != INVALID_INDEX && alt_slot != slot_id) {
+					int16 alt_parent = EQ::InventoryProfile::CalcSlotId(alt_slot);
+					bool alt_acceptable = true;
+					if (alt_parent != INVALID_INDEX) {
+						EQ::ItemInstance* alt_parent_inst = m_inv.GetItem(alt_parent);
+						if (alt_parent_inst) {
+							const auto alt_parent_item = alt_parent_inst->GetItem();
+							if (alt_parent_item) {
+								bool alt_parent_requires_tradeskill = alt_parent_item->Tradeskills ||
+									alt_parent_item->BagType == EQ::item::BagTypeTradeskillBag;
+								if (alt_parent_requires_tradeskill) {
+									alt_acceptable = false;
+								}
+							}
+						}
+					}
+
+					if (alt_acceptable) {
+						PutLootInInventory(alt_slot, inst, bag_item_data);
+						return;
+					}
+				}
+
+				PutItemInInventory(EQ::invslot::slotCursor, inst, true);
+				return;
+			}
+
+			const auto parent_item = parent_inst->GetItem();
+			bool parent_requires_tradeskill = false;
+			if (parent_item) {
+				parent_requires_tradeskill = parent_item->Tradeskills ||
+					parent_item->BagType == EQ::item::BagTypeTradeskillBag;
+			}
+
+			if (parent_requires_tradeskill && !inst.GetItem()->Tradeskills) {
+				int16 alt_slot = m_inv.FindFirstFreeSlotThatFitsItem(inst.GetItem());
+				if (alt_slot != INVALID_INDEX && alt_slot != slot_id) {
+					int16 alt_parent = EQ::InventoryProfile::CalcSlotId(alt_slot);
+					bool alt_acceptable = true;
+					if (alt_parent != INVALID_INDEX) {
+						EQ::ItemInstance* alt_parent_inst = m_inv.GetItem(alt_parent);
+						if (alt_parent_inst) {
+							const auto alt_parent_item = alt_parent_inst->GetItem();
+							if (alt_parent_item) {
+								bool alt_parent_requires_tradeskill = alt_parent_item->Tradeskills ||
+									alt_parent_item->BagType == EQ::item::BagTypeTradeskillBag;
+								if (alt_parent_requires_tradeskill) {
+									alt_acceptable = false;
+								}
+							}
+						}
+					}
+
+					if (alt_acceptable) {
+						PutLootInInventory(alt_slot, inst, bag_item_data);
+						return;
+					}
+				}
+
+				PutItemInInventory(EQ::invslot::slotCursor, inst, true);
+				return;
+			}
+		}
+	}
+
 	if (slot_id == EQ::invslot::slotCursor) {
 		m_inv.PushCursor(inst);
 		auto s = m_inv.cursor_cbegin(), e = m_inv.cursor_cend();

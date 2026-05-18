@@ -832,6 +832,10 @@ int16 EQ::InventoryProfile::FindFreeSlot(bool for_bag, bool try_cursor, uint8 mi
 
 			const EQ::ItemInstance* inst = GetItem(i);
 			if (inst && inst->IsClassBag() && inst->GetItem()->BagSize >= min_size) {
+				if (inst->GetItem()->Tradeskills && inst->GetItem()->BagType == item::BagTypeTradeskillBag) {
+					continue;
+				}
+
 				if (inst->GetItem()->BagType == item::BagTypeQuiver &&
 					inst->GetItem()->ItemType != item::ItemTypeArrow) {
 					continue;
@@ -1718,7 +1722,7 @@ int16 EQ::InventoryProfile::_HasItemByLoreGroup(std::map<int16, ItemInstance*>& 
 				continue;
 			}
 
-			if (bag_inst->IsClassCommon() && bag_inst->GetItem()->LoreGroup == loregroup) {
+			if (bag_inst->GetItem()->LoreGroup == loregroup) {
 				return InventoryProfile::CalcSlotId(iter->first, bag_iter->first);
 			}
 
@@ -1772,7 +1776,7 @@ int16 EQ::InventoryProfile::_HasItemByLoreGroup(ItemInstQueue& iqueue, uint32 lo
 				continue;
 			}
 
-			if (bag_inst->IsClassCommon() && bag_inst->GetItem()->LoreGroup == loregroup) {
+			if (bag_inst->GetItem()->LoreGroup == loregroup) {
 				return InventoryProfile::CalcSlotId(invslot::slotCursor, bag_iter->first);
 			}
 
@@ -1823,17 +1827,22 @@ int16 EQ::InventoryProfile::FindFirstFreeSlotThatFitsItem(const EQ::ItemData *it
 			return i;
 		}
 
-		if (inv_item->IsClassBag() &&
-			EQ::InventoryProfile::CanItemFitInContainer(item_data, inv_item->GetItem())) {
+		if (inv_item->IsClassBag()) {
+			const auto *parent_item = inv_item->GetItem();
+			if (parent_item && !item_data->Tradeskills && parent_item->BagType == EQ::item::BagTypeTradeskillBag) {
+				continue;
+			}
 
-			int16 base_slot_id = EQ::InventoryProfile::CalcSlotId(i, EQ::invbag::SLOT_BEGIN);
-			uint8 bag_size     = inv_item->GetItem()->BagSlots;
+			if (parent_item && EQ::InventoryProfile::CanItemFitInContainer(item_data, parent_item)) {
+				int16 base_slot_id = EQ::InventoryProfile::CalcSlotId(i, EQ::invbag::SLOT_BEGIN);
+				uint8 bag_size     = inv_item->GetItem()->BagSlots;
 
-			for (uint8 bag_slot = EQ::invbag::SLOT_BEGIN; bag_slot < bag_size; bag_slot++) {
-				auto bag_item = GetItem(base_slot_id + bag_slot);
-				if (!bag_item) {
-					// Found available slot within bag
-					return base_slot_id + bag_slot;
+				for (uint8 bag_slot = EQ::invbag::SLOT_BEGIN; bag_slot < bag_size; bag_slot++) {
+					auto bag_item = GetItem(base_slot_id + bag_slot);
+					if (!bag_item) {
+						// Found available slot within bag
+						return base_slot_id + bag_slot;
+					}
 				}
 			}
 		}
