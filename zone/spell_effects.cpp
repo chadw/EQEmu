@@ -792,7 +792,12 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 				Mob *my_pet = GetPet();
 				if(my_pet)
 				{
-					my_pet->Kill();
+					if (my_pet->GetPetType() == PetType::Charmed) {
+						my_pet->Kill();
+					} else {
+						my_pet->SetPetOrder(PetOrder::Sit);
+						my_pet->WipeHateList();
+					}
 				}
 
 				caster->SetPet(this);
