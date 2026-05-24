@@ -2812,13 +2812,14 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 						float new_ground = GetGroundZ(my_x, my_y);
 
 						if(caster->IsClient())
-							caster->CastToClient()->MovePC(zone->GetZoneID(), zone->GetInstanceID(), my_x, my_y, new_ground, GetHeading());
+							caster->CastToClient()->MovePC(zone->GetZoneID(), zone->GetInstanceID(), my_x, my_y, new_ground, caster->CastToClient()->GetHeading());
 						else
 							caster->GMMove(my_x, my_y, new_ground, GetHeading());
 					}
 				}
 				break;
 			}
+
 			case SpellEffect::VoiceGraft:
 			{
 				if(caster && caster->GetPet())
