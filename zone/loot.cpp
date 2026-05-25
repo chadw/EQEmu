@@ -637,8 +637,50 @@ void ZoneDatabase::LoadGlobalLoot()
 	for (const auto &e: l) {
 		if (!e.zone.empty()) {
 			const auto &zones = Strings::Split(e.zone, "|");
+			bool match = false;
 
-			if (!Strings::Contains(zones, zone_id)) {
+			for (auto z : zones) {
+				z = Strings::Trim(z);
+
+				if (Strings::Contains(z, ":")) {
+					const auto &zone_parts = Strings::Split(z, ":");
+
+					if (zone_parts.size() != 2) {
+						continue;
+					}
+
+					uint16 z_id = Strings::ToUnsignedInt(zone_parts[0]);
+					if (z_id != zone->GetZoneID()) {
+						continue;
+					}
+
+					const auto &versions = Strings::Split(zone_parts[1], ",");
+
+					for (const auto &v : versions) {
+						std::string version = v;
+						Strings::Trim(version);
+						uint16 z_ver = Strings::ToUnsignedInt(version);
+
+						if (z_ver == zone->GetInstanceVersion()) {
+							match = true;
+							break;
+						}
+					}
+
+					if (match) {
+						break;
+					}
+				} else {
+					uint16 parsed_zone = Strings::ToUnsignedInt(z);
+
+					if (parsed_zone == zone->GetZoneID()) {
+						match = true;
+						break;
+					}
+				}
+			}
+
+			if (!match) {
 				continue;
 			}
 		}
