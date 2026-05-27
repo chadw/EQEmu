@@ -792,8 +792,17 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 				Mob *my_pet = GetPet();
 				if(my_pet)
 				{
-					my_pet->SetPetOrder(PetOrder::Sit);
-					my_pet->WipeHateList();
+					// NPCs should still lose pets when charmed
+					if (IsNPC()) {
+						my_pet->Kill();
+					}
+					else if (IsClient()) {
+
+						// Preserve client summoned pets
+						my_pet->SetPetOrder(PetOrder::Follow);
+						my_pet->WipeHateList();
+						entity_list.RemoveFromHateLists(my_pet);
+					}
 				}
 
 				caster->SetPet(this);
@@ -1515,8 +1524,12 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 						);
 						caster->SendAppearancePacket(AppearanceType::Size, static_cast<uint32>(caster->GetTarget()->GetSize()));
 
-						for (int x = EQ::textures::textureBegin; x <= EQ::textures::LastTintableTexture; x++)
+						for (int x = EQ::textures::textureBegin; x <= EQ::textures::LastTintableTexture; x++) {
 							caster->SendWearChange(x);
+						}
+
+						caster->SendWearChange(EQ::textures::weaponPrimary);
+						caster->SendWearChange(EQ::textures::weaponSecondary);
 				}
 				break;
 			}
@@ -4352,6 +4365,9 @@ void Mob::BuffFadeBySlot(int slot, bool iRecalcBonuses)
 				for (int x = EQ::textures::textureBegin; x <= EQ::textures::LastTintableTexture; x++) {
 					SendWearChange(x);
 				}
+
+				SendWearChange(EQ::textures::weaponPrimary);
+				SendWearChange(EQ::textures::weaponSecondary);
 
 				break;
 			}
@@ -10557,6 +10573,9 @@ void Mob::ApplySpellEffectIllusion(int32 spell_id, Mob *caster, int buffslot, in
 	for (int x = EQ::textures::textureBegin; x <= EQ::textures::LastTintableTexture; x++) {
 		SendWearChange(x);
 	}
+
+	SendWearChange(EQ::textures::weaponPrimary);
+	SendWearChange(EQ::textures::weaponSecondary);
 
 	if (buffslot != -1) {
 		if (
