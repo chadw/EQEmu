@@ -174,7 +174,7 @@ bool NPC::AICastSpell(Mob* tar, uint8 iChance, uint32 iSpellTypes, bool bInnates
 					case SpellType_Buff: {
 						if (
 							(spells[AIspells[i].spellid].target_type == ST_Target || tar == this)
-							&& tar->DontBuffMeBefore() < Timer::GetCurrentTime()
+							//&& tar->DontBuffMeBefore() < Timer::GetCurrentTime()
 							&& !tar->IsImmuneToSpell(AIspells[i].spellid, this)
 							&& tar->CanBuffStack(AIspells[i].spellid, GetLevel(), true) >= 0
 							&& !(tar->IsPet() && tar->GetOwner()->IsOfClientBot() && this != tar)	//no buffing PC's pets, but they can buff themself
@@ -187,7 +187,7 @@ bool NPC::AICastSpell(Mob* tar, uint8 iChance, uint32 iSpellTypes, bool bInnates
 							}
 							uint32 tempTime = 0;
 							AIDoSpellCast(i, tar, mana_cost, &tempTime);
-							tar->SetDontBuffMeBefore(tempTime);
+							//tar->SetDontBuffMeBefore(tempTime);
 							return true;
 						}
 						break;
@@ -372,7 +372,21 @@ bool NPC::AIDoSpellCast(int32 i, Mob* tar, int32 mana_cost, uint32* oDontDoAgain
 	LogAI("spellid [{}] tar [{}] mana [{}] Name [{}]", AIspells[i].spellid, tar->GetName(), mana_cost, spells[AIspells[i].spellid].name);
 	casting_spell_AIindex = i;
 
-	return CastSpell(AIspells[i].spellid, tar->GetID(), EQ::spells::CastingSlot::Gem2, AIspells[i].manacost == -2 ? 0 : -1, mana_cost, oDontDoAgainBefore, -1, -1, 0, &(AIspells[i].resist_adjust));
+	//return CastSpell(AIspells[i].spellid, tar->GetID(), EQ::spells::CastingSlot::Gem2, AIspells[i].manacost == -2 ? 0 : -1, mana_cost, oDontDoAgainBefore, -1, -1, 0, &(AIspells[i].resist_adjust));
+	// For buff spells, force a 0 cast time so the NPC applies them instantly
+	int32 cast_time = (AIspells[i].type == SpellType_Buff) ? 0 : (AIspells[i].manacost == -2 ? 0 : -1);
+	return CastSpell(
+		AIspells[i].spellid,
+		tar->GetID(),
+		EQ::spells::CastingSlot::Gem2,
+		cast_time,
+		mana_cost,
+		oDontDoAgainBefore,
+		-1,
+		-1,
+		0,
+		&(AIspells[i].resist_adjust)
+	);
 }
 
 void Mob::AI_Init()
