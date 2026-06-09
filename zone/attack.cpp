@@ -3735,9 +3735,28 @@ int64 Mob::AffectMagicalDamage(int64 damage, uint16 spell_id, const bool iBuffTi
 	// This must be a DD then so lets apply Spell Shielding and runes.
 	else
 	{
-		// Reduce damage by the Spell Shielding first so that the runes don't take the raw damage.
-		int total_spellshielding = itembonuses.SpellShield + itembonuses.MitigateSpellRune[SBIndex::MITIGATION_RUNE_PERCENT] + aabonuses.MitigateSpellRune[SBIndex::MITIGATION_RUNE_PERCENT];
-		damage -= (damage * total_spellshielding / 100);
+		int innate = 0;
+		if (IsValidSpell(spell_id)) {
+			switch (spells[spell_id].resist_type) {
+				case RESIST_FIRE:    innate = GetInnateSpellShieldFire(); break;
+				case RESIST_COLD:    innate = GetInnateSpellShieldCold(); break;
+				case RESIST_POISON:  innate = GetInnateSpellShieldPoison(); break;
+				case RESIST_DISEASE: innate = GetInnateSpellShieldDisease(); break;
+				case RESIST_MAGIC:   innate = GetInnateSpellShieldMagic(); break;
+				default:             innate = GetInnateSpellShield(); break;
+			}
+		}
+		else {
+			innate = GetInnateSpellShield();
+		}
+		if (innate < 0)
+			innate = 0;
+		if (innate > 100)
+			innate = 100;
+
+		int total_spellshielding = itembonuses.SpellShield + innate + itembonuses.MitigateSpellRune[SBIndex::MITIGATION_RUNE_PERCENT] + aabonuses.MitigateSpellRune[SBIndex::MITIGATION_RUNE_PERCENT];
+		int64 dmg_reduction = (damage * static_cast<int64>(total_spellshielding)) / 100;
+		damage -= dmg_reduction;
 
 		//Only mitigate if damage is above the minimium specified.
 		if (spellbonuses.SpellThresholdGuard[SBIndex::THRESHOLDGUARD_MITIGATION_PERCENT]) {

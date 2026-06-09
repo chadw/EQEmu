@@ -135,6 +135,12 @@ struct NPCType
 	uint32          emoteid;
 	float           spellscale;
 	float           healscale;
+	int32_t         spell_shield;
+	int32_t         spell_shield_fire;
+	int32_t         spell_shield_cold;
+	int32_t         spell_shield_poison;
+	int32_t         spell_shield_disease;
+	int32_t         spell_shield_magic;
 	bool            no_target_hotkey;
 	bool            raid_target;
 	uint8           armtexture;

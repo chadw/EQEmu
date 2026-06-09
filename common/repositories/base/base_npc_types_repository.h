@@ -167,6 +167,12 @@ public:
 		uint8_t     is_parcel_merchant;
 		uint8_t     multiquest_enabled;
 		uint16_t    npc_tint_id;
+		int32_t     spell_shield;
+		int32_t     spell_shield_fire;
+		int32_t     spell_shield_cold;
+		int32_t     spell_shield_poison;
+		int32_t     spell_shield_disease;
+		int32_t     spell_shield_magic;
 	};
 
 	static std::string PrimaryKey()
@@ -308,6 +314,12 @@ public:
 			"is_parcel_merchant",
 			"multiquest_enabled",
 			"npc_tint_id",
+			"spell_shield",
+			"spell_shield_fire",
+			"spell_shield_cold",
+			"spell_shield_poison",
+			"spell_shield_disease",
+			"spell_shield_magic",
 		};
 	}
 
@@ -445,6 +457,12 @@ public:
 			"is_parcel_merchant",
 			"multiquest_enabled",
 			"npc_tint_id",
+			"spell_shield",
+			"spell_shield_fire",
+			"spell_shield_cold",
+			"spell_shield_poison",
+			"spell_shield_disease",
+			"spell_shield_magic",
 		};
 	}
 
@@ -616,6 +634,12 @@ public:
 		e.is_parcel_merchant     = 0;
 		e.multiquest_enabled     = 0;
 		e.npc_tint_id            = 0;
+		e.spell_shield           = 0;
+		e.spell_shield_fire      = 0;
+		e.spell_shield_cold      = 0;
+		e.spell_shield_poison    = 0;
+		e.spell_shield_disease   = 0;
+		e.spell_shield_magic     = 0;
 
 		return e;
 	}
@@ -783,6 +807,12 @@ public:
 			e.is_parcel_merchant     = row[128] ? static_cast<uint8_t>(strtoul(row[128], nullptr, 10)) : 0;
 			e.multiquest_enabled     = row[129] ? static_cast<uint8_t>(strtoul(row[129], nullptr, 10)) : 0;
 			e.npc_tint_id            = row[130] ? static_cast<uint16_t>(strtoul(row[130], nullptr, 10)) : 0;
+			e.spell_shield           = row[131] ? static_cast<int32_t>(atoi(row[131])) : 0;
+			e.spell_shield_fire      = row[132] ? static_cast<int32_t>(atoi(row[132])) : 0;
+			e.spell_shield_cold      = row[133] ? static_cast<int32_t>(atoi(row[133])) : 0;
+			e.spell_shield_poison    = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
+			e.spell_shield_disease   = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
+			e.spell_shield_magic     = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
 
 			return e;
 		}
@@ -946,6 +976,12 @@ public:
 		v.push_back(columns[128] + " = " + std::to_string(e.is_parcel_merchant));
 		v.push_back(columns[129] + " = " + std::to_string(e.multiquest_enabled));
 		v.push_back(columns[130] + " = " + std::to_string(e.npc_tint_id));
+		v.push_back(columns[131] + " = " + std::to_string(e.spell_shield));
+		v.push_back(columns[132] + " = " + std::to_string(e.spell_shield_fire));
+		v.push_back(columns[133] + " = " + std::to_string(e.spell_shield_cold));
+		v.push_back(columns[134] + " = " + std::to_string(e.spell_shield_poison));
+		v.push_back(columns[135] + " = " + std::to_string(e.spell_shield_disease));
+		v.push_back(columns[136] + " = " + std::to_string(e.spell_shield_magic));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1098,6 +1134,12 @@ public:
 		v.push_back(std::to_string(e.is_parcel_merchant));
 		v.push_back(std::to_string(e.multiquest_enabled));
 		v.push_back(std::to_string(e.npc_tint_id));
+		v.push_back(std::to_string(e.spell_shield));
+		v.push_back(std::to_string(e.spell_shield_fire));
+		v.push_back(std::to_string(e.spell_shield_cold));
+		v.push_back(std::to_string(e.spell_shield_poison));
+		v.push_back(std::to_string(e.spell_shield_disease));
+		v.push_back(std::to_string(e.spell_shield_magic));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1258,6 +1300,12 @@ public:
 			v.push_back(std::to_string(e.is_parcel_merchant));
 			v.push_back(std::to_string(e.multiquest_enabled));
 			v.push_back(std::to_string(e.npc_tint_id));
+			v.push_back(std::to_string(e.spell_shield));
+			v.push_back(std::to_string(e.spell_shield_fire));
+			v.push_back(std::to_string(e.spell_shield_cold));
+			v.push_back(std::to_string(e.spell_shield_poison));
+			v.push_back(std::to_string(e.spell_shield_disease));
+			v.push_back(std::to_string(e.spell_shield_magic));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}
@@ -1422,6 +1470,12 @@ public:
 			e.is_parcel_merchant     = row[128] ? static_cast<uint8_t>(strtoul(row[128], nullptr, 10)) : 0;
 			e.multiquest_enabled     = row[129] ? static_cast<uint8_t>(strtoul(row[129], nullptr, 10)) : 0;
 			e.npc_tint_id            = row[130] ? static_cast<uint16_t>(strtoul(row[130], nullptr, 10)) : 0;
+			e.spell_shield           = row[131] ? static_cast<int32_t>(atoi(row[131])) : 0;
+			e.spell_shield_fire 	 = row[132] ? static_cast<int32_t>(atoi(row[132])) : 0;
+			e.spell_shield_cold 	 = row[133] ? static_cast<int32_t>(atoi(row[133])) : 0;
+			e.spell_shield_poison 	 = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
+			e.spell_shield_disease 	 = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
+			e.spell_shield_magic 	 = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
 
 			all_entries.push_back(e);
 		}
@@ -1577,6 +1631,12 @@ public:
 			e.is_parcel_merchant     = row[128] ? static_cast<uint8_t>(strtoul(row[128], nullptr, 10)) : 0;
 			e.multiquest_enabled     = row[129] ? static_cast<uint8_t>(strtoul(row[129], nullptr, 10)) : 0;
 			e.npc_tint_id            = row[130] ? static_cast<uint16_t>(strtoul(row[130], nullptr, 10)) : 0;
+			e.spell_shield 			 = row[131] ? static_cast<int32_t>(atoi(row[131])) : 0;
+			e.spell_shield_fire 	 = row[132] ? static_cast<int32_t>(atoi(row[132])) : 0;
+			e.spell_shield_cold 	 = row[133] ? static_cast<int32_t>(atoi(row[133])) : 0;
+			e.spell_shield_poison 	 = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
+			e.spell_shield_disease 	 = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
+			e.spell_shield_magic 	 = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
 
 			all_entries.push_back(e);
 		}
@@ -1782,6 +1842,12 @@ public:
 		v.push_back(std::to_string(e.is_parcel_merchant));
 		v.push_back(std::to_string(e.multiquest_enabled));
 		v.push_back(std::to_string(e.npc_tint_id));
+		v.push_back(std::to_string(e.spell_shield));
+		v.push_back(std::to_string(e.spell_shield_fire));
+		v.push_back(std::to_string(e.spell_shield_cold));
+		v.push_back(std::to_string(e.spell_shield_poison));
+		v.push_back(std::to_string(e.spell_shield_disease));
+		v.push_back(std::to_string(e.spell_shield_magic));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1935,6 +2001,12 @@ public:
 			v.push_back(std::to_string(e.is_parcel_merchant));
 			v.push_back(std::to_string(e.multiquest_enabled));
 			v.push_back(std::to_string(e.npc_tint_id));
+			v.push_back(std::to_string(e.spell_shield));
+			v.push_back(std::to_string(e.spell_shield_fire));
+			v.push_back(std::to_string(e.spell_shield_cold));
+			v.push_back(std::to_string(e.spell_shield_poison));
+			v.push_back(std::to_string(e.spell_shield_disease));
+			v.push_back(std::to_string(e.spell_shield_magic));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}

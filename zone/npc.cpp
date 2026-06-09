@@ -219,6 +219,13 @@ NPC::NPC(const NPCType *npc_type_data, Spawn2 *in_respawn, const glm::vec4 &posi
 	keeps_sold_items     = npc_type_data->keeps_sold_items;
 	m_multiquest_enabled = npc_type_data->multiquest_enabled;
 
+	SetInnateSpellShield(npc_type_data->spell_shield);
+	SetInnateSpellShieldFire(npc_type_data->spell_shield_fire);
+	SetInnateSpellShieldCold(npc_type_data->spell_shield_cold);
+	SetInnateSpellShieldPoison(npc_type_data->spell_shield_poison);
+	SetInnateSpellShieldDisease(npc_type_data->spell_shield_disease);
+	SetInnateSpellShieldMagic(npc_type_data->spell_shield_magic);
+
 	// used for when switch back to charm
 	default_ac               = npc_type_data->AC;
 	default_min_dmg          = min_dmg;

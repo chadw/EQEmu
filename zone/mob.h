@@ -196,6 +196,24 @@ public:
 	inline virtual bool IsMob() const { return true; }
 	inline virtual bool InZone() const { return true; }
 
+	inline void SetInnateSpellShield(int32_t v) { innate_spell_shield = v; }
+	inline int32_t GetInnateSpellShield() const { return innate_spell_shield; }
+
+	inline void SetInnateSpellShieldFire(int32_t v) { innate_spell_shield_fire = v; }
+	inline int32_t GetInnateSpellShieldFire() const { return innate_spell_shield_fire; }
+
+	inline void SetInnateSpellShieldCold(int32_t v) { innate_spell_shield_cold = v; }
+	inline int32_t GetInnateSpellShieldCold() const { return innate_spell_shield_cold; }
+
+	inline void SetInnateSpellShieldPoison(int32_t v) { innate_spell_shield_poison = v; }
+	inline int32_t GetInnateSpellShieldPoison() const { return innate_spell_shield_poison; }
+
+	inline void SetInnateSpellShieldDisease(int32_t v) { innate_spell_shield_disease = v; }
+	inline int32_t GetInnateSpellShieldDisease() const { return innate_spell_shield_disease; }
+
+	inline void SetInnateSpellShieldMagic(int32_t v) { innate_spell_shield_magic = v; }
+	inline int32_t GetInnateSpellShieldMagic() const { return innate_spell_shield_magic; }
+
 	void DisplayInfo(Mob *mob);
 
 	std::unordered_map<uint16, Mob *>  m_close_mobs;
@@ -208,6 +226,13 @@ public:
 	// client_id -> slot_id -> key
 	std::unordered_map<uint32_t, std::unordered_map<uint8_t, uint64_t>> m_last_seen_wearchange;
 	Timer m_clear_wearchange_cache_timer;
+
+	int32_t innate_spell_shield = 0;
+	int32_t innate_spell_shield_fire = 0;
+	int32_t innate_spell_shield_cold = 0;
+	int32_t innate_spell_shield_poison = 0;
+	int32_t innate_spell_shield_disease = 0;
+	int32_t innate_spell_shield_magic = 0;
 
 	// Bot attack flag
 	Timer bot_attack_flag_timer;

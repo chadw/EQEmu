@@ -1892,6 +1892,14 @@ const NPCType *ZoneDatabase::LoadNPCTypesData(uint32 npc_type_id, bool bulk_load
 		t->emoteid                = n.emoteid;
 		t->spellscale             = n.spellscale;
 		t->healscale              = n.healscale;
+
+		t->spell_shield = n.spell_shield;
+		t->spell_shield_fire   = n.spell_shield_fire;
+		t->spell_shield_cold   = n.spell_shield_cold;
+		t->spell_shield_poison = n.spell_shield_poison;
+		t->spell_shield_disease= n.spell_shield_disease;
+		t->spell_shield_magic  = n.spell_shield_magic;
+
 		t->no_target_hotkey       = n.no_target_hotkey != 0;
 		t->raid_target            = n.raid_target != 0;
 		t->attack_delay           = n.attack_delay * 100; // TODO: fix DB
