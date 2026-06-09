@@ -210,6 +210,7 @@ int command_init(void)
 		command_add("rl", "Reloads logs (alias of #reload logs).", AccountStatus::GMMgmt, command_reload) ||
 		command_add("removeitem", "[Item ID] [Amount] - Removes the specified Item ID by Amount from you or your player target's inventory (Amount defaults to 1 if not used)", AccountStatus::GMAdmin, command_removeitem) ||
 		command_add("repop", "[Force] - Repop the zone with optional force repop", AccountStatus::GMAdmin, command_repop) ||
+		command_add("repopnpc", "[target or npc_id] - Repop a single NPC to its spawnpoint if present, otherwise at your location", AccountStatus::GMAdmin, command_repopnpc) ||
 		command_add("resetaa", "[aa|leadership] - Resets a player's AAs or Leadership AAs and refunds spent AAs (not Leadership AAs) to unspent, may disconnect player.", AccountStatus::GMMgmt, command_resetaa) ||
 		command_add("resetaa_timer", "[All|Timer ID] - Command to reset AA cooldown timers for you or your player target.", AccountStatus::GMMgmt, command_resetaa_timer) ||
 		command_add("resetdisc_timer", "[All|Timer ID] - Command to reset discipline timers.", AccountStatus::GMMgmt, command_resetdisc_timer) ||
@@ -254,6 +255,7 @@ int command_init(void)
 		command_add("worldwide", "Performs world-wide GM functions such as cast (can be extended for other commands). Use caution", AccountStatus::GMImpossible, command_worldwide) ||
 		command_add("zone", "[Zone ID|Zone Short Name] [X] [Y] [Z] - Teleport to specified Zone by ID or Short Name (coordinates are optional)", AccountStatus::Guide, command_zone) ||
 		command_add("zonebootup", "[ZoneServerID] [shortname] - Make a zone server boot a specific zone", AccountStatus::GMLeadAdmin, command_zonebootup) ||
+		command_add("zoneinfo", "Shows basic zone information", AccountStatus::Player, command_zone_info) ||
 		command_add("zoneinstance", "[Instance ID] [X] [Y] [Z] - Teleport to specified Instance by ID (coordinates are optional)", AccountStatus::Guide, command_zone_instance) ||
 		command_add("zoneshard", "[zone] [instance_id] - Teleport explicitly to a zone shard", AccountStatus::Player, command_zone_shard) ||
 		command_add("zoneshutdown", "[instance|zone] [Instance ID|Zone ID|Zone Short Name] - Shut down a zone server by Instance ID, Zone ID, or Zone Short Name", AccountStatus::GMLeadAdmin, command_zoneshutdown) ||

@@ -123,6 +123,14 @@ void SpawnGroup::AddSpawnEntry(std::unique_ptr<SpawnEntry> &newEntry)
 	list_.push_back(std::move(newEntry));
 }
 
+bool SpawnGroup::ContainsNPCType(uint32 npc_type) const {
+	for (const auto &e : list_) {
+		if (e && e->NPCType == npc_type)
+			return true;
+	}
+	return false;
+}
+
 SpawnGroup::~SpawnGroup()
 {
 	list_.clear();

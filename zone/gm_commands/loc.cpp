@@ -27,19 +27,6 @@ void command_loc(Client *c, const Seperator *sep)
 
 	auto target_position = target->GetPosition();
 
-	// check los benchmark
-	BenchTimer timer;
-	for (int i = 0; i < 1000; i++) {
-		zone->zonemap->CheckLoS(c->GetPosition(), target_position);
-	}
-	c->Message(
-		Chat::White,
-		fmt::format(
-			"CheckLoS benchmark took [{}]",
-			timer.elapsed()
-		).c_str()
-	);
-
 	c->Message(
 		Chat::White,
 		fmt::format(
@@ -55,6 +42,19 @@ void command_loc(Client *c, const Seperator *sep)
 	if (!zone->zonemap) {
 		c->Message(Chat::White, "Map not loaded for this zone.");
 	} else {
+		// check los benchmark
+		BenchTimer timer;
+		for (int i = 0; i < 1000; i++) {
+			zone->zonemap->CheckLoS(c->GetPosition(), target_position);
+		}
+		c->Message(
+			Chat::White,
+			fmt::format(
+				"CheckLoS benchmark took [{}]",
+				timer.elapsed()
+			).c_str()
+		);
+
 		auto z = target->GetZ() + (target->GetSize() == 0.0 ? 6 : target->GetSize()) * HEAD_POSITION;
 		auto tarloc = glm::vec3(target->GetX(), target->GetY(), z);
 		glm::vec3 hit;

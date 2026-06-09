@@ -58,6 +58,7 @@ public:
 	~SpawnGroup();
 	uint32 GetNPCType(uint16 condition_value_filter=1);
 	void AddSpawnEntry(std::unique_ptr<SpawnEntry> &newEntry);
+	bool ContainsNPCType(uint32 npc_type) const;
 	uint32 id;
 	bool wp_spawns;			// if true, spawn NPCs at a random waypoint location (if spawnpoint has a grid) instead of the spawnpoint's loc
 	float  roamdist;

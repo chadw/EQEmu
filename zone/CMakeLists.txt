@@ -502,6 +502,7 @@ set(gm_command_sources
     gm_commands/reload.cpp
     gm_commands/removeitem.cpp
     gm_commands/repop.cpp
+    gm_commands/repopnpc.cpp
     gm_commands/resetaa.cpp
     gm_commands/resetaa_timer.cpp
     gm_commands/resetdisc_timer.cpp
@@ -652,6 +653,7 @@ set(gm_command_sources
     gm_commands/wp.cpp
     gm_commands/wpadd.cpp
     gm_commands/zone.cpp
+    gm_commands/zone_info.cpp
     gm_commands/zone_instance.cpp
     gm_commands/zone_shard.cpp
     gm_commands/zonebootup.cpp

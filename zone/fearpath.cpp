@@ -254,6 +254,11 @@ void Mob::ProcessFlee()
 
 void Mob::CalculateNewFearpoint()
 {
+	// if no map, no fear
+	if (!zone->zonemap) {
+		return;
+	}
+
 	// blind waypoint logic isn't the same as fear's.  Has a chance to run toward the player
 	// chance is very high if the player is moving, otherwise it's low
 	if (IsBlind() && !IsFeared() && GetTarget()) {
