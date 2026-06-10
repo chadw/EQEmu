@@ -15073,7 +15073,8 @@ void Client::Handle_OP_TargetCommand(const EQApplicationPacket *app)
 	Mob *nt = entity_list.GetMob(ct->new_target);
 
 	if (nt) {
-		if (GetGM() || (!nt->IsInvisible(this) && (DistanceSquared(m_Position, nt->GetPosition()) <= TARGETING_RANGE*TARGETING_RANGE))) {
+		// GMs can always target; normal players cannot target while blind or if the target is invisible/out of range
+		if (GetGM() || (!IsBlind() && !nt->IsInvisible(this) && (DistanceSquared(m_Position, nt->GetPosition()) <= TARGETING_RANGE*TARGETING_RANGE))) {
 			if (nt->GetBodyType() == BodyType::NoTarget2 ||
 				nt->GetBodyType() == BodyType::Special ||
 				nt->GetBodyType() == BodyType::NoTarget) {
@@ -15119,8 +15120,15 @@ void Client::Handle_OP_TargetMouse(const EQApplicationPacket *app)
 		Mob *nt = entity_list.GetMob(ct->new_target);
 		if (nt)
 		{
-			SetTarget(nt);
-			bool inspect_buffs = false;
+			// Prevent mouse-targeting if blind (unless GM), or if the target is invisible/out of range
+			if (!(GetGM() || (!IsBlind() && !nt->IsInvisible(this) && (DistanceSquared(m_Position, nt->GetPosition()) <= TARGETING_RANGE*TARGETING_RANGE)))) {
+				MessageString(Chat::Red, DONT_SEE_TARGET);
+				SetTarget(nullptr);
+				SetHoTT(0);
+				UpdateXTargetType(TargetsTarget, nullptr);
+			} else {
+				SetTarget(nt);
+				bool inspect_buffs = false;
 			// rank 1 gives you ability to see NPC buffs in target window (SoD+)
 			if (nt->IsNPC()) {
 				if (IsRaidGrouped()) {

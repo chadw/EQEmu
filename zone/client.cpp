@@ -16,6 +16,7 @@
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 #include "client.h"
+#include <cmath>
 
 #include "common/data_bucket.h"
 #include "common/data_verification.h"
@@ -8295,19 +8296,34 @@ void Client::SetFactionLevel(
 		current_value = GetCharacterFactionLevel(e.faction_id);
 		faction_before = current_value;
 
+		// Compute combined FactionModPct for this client and calculate adjusted value
+		int combined_faction_mod_pct = spellbonuses.FactionModPct + itembonuses.FactionModPct + aabonuses.FactionModPct;
+		int32_t adjusted_value = e.value;
+		if (combined_faction_mod_pct != 0 && e.value != 0) {
+			int sign = (e.value > 0) ? 1 : -1;
+			int32_t abs_val = std::abs(e.value);
+			adjusted_value = static_cast<int32_t>(std::lround(abs_val * (100 + combined_faction_mod_pct) / 100.0)) * sign;
+		}
+
 #ifdef LUA_EQEMU
 		int32 lua_ret = 0;
 		bool ignore_default = false;
-		lua_ret = LuaParser::Instance()->UpdatePersonalFaction(this, e.value, e.faction_id, current_value, e.temp, faction_minimum, faction_maximum, ignore_default);
+		// Pass the percent-adjusted value into Lua so mods see the adjusted amount
+		lua_ret = LuaParser::Instance()->UpdatePersonalFaction(this, adjusted_value, e.faction_id, current_value, e.temp, faction_minimum, faction_maximum, ignore_default);
 
 		if (ignore_default) {
-			e.value = lua_ret;
+			adjusted_value = lua_ret;
 		}
 #endif
 
+		LogFaction(
+			"SetFactionLevel: npc_faction_id={}, faction_id={}, base_value={}, combined_faction_mod_pct={}, adjusted_value={}",
+			npc_faction_id, e.faction_id, e.value, combined_faction_mod_pct, adjusted_value
+		);
+
 		UpdatePersonalFaction(
 			character_id,
-			e.value,
+			adjusted_value,
 			e.faction_id,
 			&current_value,
 			e.temp,
@@ -8316,7 +8332,7 @@ void Client::SetFactionLevel(
 		);
 
 		SendFactionMessage(
-			e.value,
+			adjusted_value,
 			e.faction_id,
 			faction_before,
 			current_value,
@@ -8360,21 +8376,48 @@ void Client::SetFactionLevel2(uint32 char_id, int32 faction_id, uint8 char_class
 		current_value = GetCharacterFactionLevel(faction_id);
 		faction_before_hit = current_value;
 
-#ifdef LUA_EQEMU
-		int32 lua_ret = 0;
-		bool ignore_default = false;
-		lua_ret = LuaParser::Instance()->UpdatePersonalFaction(this, value, faction_id, current_value, temp, this_faction_min, this_faction_max, ignore_default);
-
-		if (ignore_default) {
-			value = lua_ret;
+		int combined_faction_mod_pct = spellbonuses.FactionModPct + itembonuses.FactionModPct + aabonuses.FactionModPct;
+		int32_t adjusted_value = value;
+		if (combined_faction_mod_pct != 0 && value != 0) {
+			int sign = (value > 0) ? 1 : -1;
+			int32_t abs_val = std::abs(value);
+			adjusted_value = static_cast<int32_t>(std::lround(abs_val * (100 + combined_faction_mod_pct) / 100.0)) * sign;
 		}
+
+#ifdef LUA_EQEMU
+	int32 lua_ret = 0;
+	bool ignore_default = false;
+	lua_ret = LuaParser::Instance()->UpdatePersonalFaction(this, adjusted_value, faction_id, current_value, temp, this_faction_min, this_faction_max, ignore_default);
+
+	if (ignore_default) {
+	    adjusted_value = lua_ret;
+	}
 #endif
 
-		UpdatePersonalFaction(char_id, value, faction_id, &current_value, temp, this_faction_min, this_faction_max);
+		LogFaction(
+			"SetFactionLevel2: faction_id={}, base_value={}, combined_faction_mod_pct={}, adjusted_value={}",
+			faction_id, value, combined_faction_mod_pct, adjusted_value
+		);
 
-		//Message(Chat::Lime, "Min(%d) Max(%d) Before(%d), After(%d)\n", this_faction_min, this_faction_max, faction_before_hit, current_value);
+		UpdatePersonalFaction(
+			char_id,
+			adjusted_value,
+			faction_id,
+			&current_value,
+			temp,
+			this_faction_min,
+			this_faction_max
+		);
 
-		SendFactionMessage(value, faction_id, faction_before_hit, current_value, temp, this_faction_min, this_faction_max);
+		SendFactionMessage(
+			adjusted_value,
+			faction_id,
+			faction_before_hit,
+			current_value,
+			temp,
+			this_faction_min,
+			this_faction_max
+		);
 	}
 
 	return;
