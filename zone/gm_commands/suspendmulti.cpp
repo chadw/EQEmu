@@ -32,8 +32,8 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 
 	const auto& n = Strings::Split(sep->arg[1], "|");
 	std::vector<std::string> v;
-	for (const auto& c : n) {
-		v.emplace_back(fmt::format("'{}'", Strings::ToLower(c)));
+	for (const auto& name : n) {
+		v.emplace_back(fmt::format("'{}'", Strings::ToLower(name)));
 	}
 
 	auto days = Strings::ToUnsignedInt(sep->arg[2]);
@@ -41,7 +41,7 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 	const std::string reason = sep->arg[3] ? sep->argplus[3] : "";
 
 	auto l = AccountRepository::GetWhere(
-		database,
+		content_db,
 		fmt::format(
 			"LOWER(charname) IN ({})",
 			Strings::Implode(", ", v)
@@ -54,11 +54,11 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 	}
 
 	for (auto a : l) {
-		a.status         = -1;
-		a.suspendeduntil = std::time(nullptr) + (days * 86400);
+		a.status         = (days ? -1 : 0);
+		a.suspendeduntil = (days ? static_cast<time_t>(std::time(nullptr) + (static_cast<time_t>(days) * 86400)) : 0);
 		a.suspend_reason = reason;
 
-		if (!AccountRepository::UpdateOne(database, a)) {
+		if (!AccountRepository::UpdateOne(content_db, a)) {
 			c->Message(
 				Chat::White,
 				fmt::format(
@@ -92,19 +92,18 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 
 		if (b) {
 			b->WorldKick();
-			return;
+		} else {
+			auto pack = new ServerPacket(ServerOP_KickPlayer, sizeof(ServerKickPlayer_Struct));
+			auto *k = (ServerKickPlayer_Struct *) pack->pBuffer;
+
+			strn0cpy(k->adminname, c->GetName(), sizeof(k->adminname));
+			k->account_id = a.id;
+			k->adminrank = c->Admin();
+
+			worldserver.SendPacket(pack);
+
+			safe_delete(pack);
 		}
-
-		auto pack = new ServerPacket(ServerOP_KickPlayer, sizeof(ServerKickPlayer_Struct));
-		auto *k = (ServerKickPlayer_Struct *) pack->pBuffer;
-
-		strn0cpy(k->adminname, c->GetName(), sizeof(k->adminname));
-		k->account_id = a.id;
-		k->adminrank = c->Admin();
-
-		worldserver.SendPacket(pack);
-
-		safe_delete(pack);
 	}
 }
 

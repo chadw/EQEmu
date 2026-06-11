@@ -372,9 +372,8 @@ bool NPC::AIDoSpellCast(int32 i, Mob* tar, int32 mana_cost, uint32* oDontDoAgain
 	LogAI("spellid [{}] tar [{}] mana [{}] Name [{}]", AIspells[i].spellid, tar->GetName(), mana_cost, spells[AIspells[i].spellid].name);
 	casting_spell_AIindex = i;
 
-	//return CastSpell(AIspells[i].spellid, tar->GetID(), EQ::spells::CastingSlot::Gem2, AIspells[i].manacost == -2 ? 0 : -1, mana_cost, oDontDoAgainBefore, -1, -1, 0, &(AIspells[i].resist_adjust));
-	// For buff spells, force a 0 cast time so the NPC applies them instantly
-	int32 cast_time = (AIspells[i].type == SpellType_Buff) ? 0 : (AIspells[i].manacost == -2 ? 0 : -1);
+	// For buff and in-combat spells, force a 0 cast time so the NPC applies them instantly
+	int32 cast_time = (AIspells[i].type == SpellType_Buff || AIspells[i].type == SpellType_InCombatBuff) ? 0 : (AIspells[i].manacost == -2 ? 0 : -1);
 	return CastSpell(
 		AIspells[i].spellid,
 		tar->GetID(),
