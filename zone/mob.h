@@ -1269,6 +1269,7 @@ public:
 	void FleeInfo(Mob* client);
 	int GetFleeRatio(Mob* other = nullptr);
 	inline bool IsBlind() { return spellbonuses.IsBlind; }
+	inline bool IsBlindNew() { return spellbonuses.IsBlindNew; }
 
 	inline bool			CheckAggro(Mob* other) {return hate_list.IsEntOnHateList(other);}
 	float				CalculateHeadingToTarget(float in_x, float in_y) { return HeadingAngleToMob(in_x, in_y); }

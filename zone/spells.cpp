@@ -545,10 +545,10 @@ bool Mob::DoCastingChecksOnCaster(int32 spell_id, CastingSlot slot) {
 		return false;
 	}
 	/*
-		Can not cast if blind.
+		Can not cast if blind (only when BlindNew is present).
 	*/
-	if (RuleB(Combat, PreventCastingWhenBlind) && IsBlind()) {
-		LogSpells("Spell casting canceled [{}] : can not cast spell when blind.", spell_id);
+	if (RuleB(Combat, PreventCastingWhenBlind) && IsBlindNew()) {
+		LogSpells("Spell casting canceled [{}] : can not cast spell when blind (BlindNew).", spell_id);
 		Message(Chat::Red, "You can't see well enough to cast that.");
 		return false;
 	}

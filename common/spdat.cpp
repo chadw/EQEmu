@@ -512,7 +512,8 @@ bool IsResurrectionSicknessSpell(uint16 spell_id) {
 
 bool IsBlindSpell(uint16 spell_id)
 {
-	return IsEffectInSpell(spell_id, SpellEffect::Blind);
+	return IsEffectInSpell(spell_id, SpellEffect::Blind)
+		|| IsEffectInSpell(spell_id, SpellEffect::BlindNew);
 }
 
 bool IsHealthSpell(uint16 spell_id)

@@ -1364,7 +1364,32 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 				if (IsBeneficialSpell(spell_id) && spells[spell_id].buff_duration == 0) {
 					int buff_count = GetMaxBuffSlots();
 					for (int slot = 0; slot < buff_count; slot++) {
-						if (IsValidSpell(buffs[slot].spellid) && IsEffectInSpell(buffs[slot].spellid, SpellEffect::Blind)) {
+						if (IsValidSpell(buffs[slot].spellid) && IsBlindSpell(buffs[slot].spellid)) {
+							if (caster && TryDispel(caster->GetCasterLevel(spell_id), buffs[slot].casterlevel, 1)) {
+								BuffFadeBySlot(slot);
+								slot = buff_count;
+							}
+						}
+					}
+				}
+				else if (!IsClient()) {
+					CalculateNewFearpoint();
+				}
+				break;
+			}
+
+			case SpellEffect::BlindNew:
+			{
+	#ifdef SPELL_EFFECT_SPAM
+				snprintf(effect_desc, _EDLEN, "BlindNew: %+i", effect_value);
+	#endif
+				// Amnesia component
+				Amnesia(true);
+				// Then perform Blind behavior (cure blind / NPC fear point)
+				if (IsBeneficialSpell(spell_id) && spells[spell_id].buff_duration == 0) {
+					int buff_count = GetMaxBuffSlots();
+					for (int slot = 0; slot < buff_count; slot++) {
+						if (IsValidSpell(buffs[slot].spellid) && IsBlindSpell(buffs[slot].spellid)) {
 							if (caster && TryDispel(caster->GetCasterLevel(spell_id), buffs[slot].casterlevel, 1)) {
 								BuffFadeBySlot(slot);
 								slot = buff_count;
@@ -4556,6 +4581,13 @@ void Mob::BuffFadeBySlot(int slot, bool iRecalcBonuses)
 			}
 
 			case SpellEffect::Blind:
+				if (currently_fleeing && !FindType(SpellEffect::Fear))
+					currently_fleeing = false;
+				break;
+
+			case SpellEffect::BlindNew:
+				// remove Amnesia component
+				Amnesia(false);
 				if (currently_fleeing && !FindType(SpellEffect::Fear))
 					currently_fleeing = false;
 				break;

@@ -671,7 +671,7 @@ RULE_INT(Combat, ThrowingBaseDamage, 0, "Throwing base damage, default is 0")
 RULE_INT(Combat, TigerClawBaseDamage, 4, "Tiger Claw base damage, default is 4")
 /* Lazarus */
 RULE_INT(Combat, SummonImmunitySeconds, 0, "Seconds to make players immune to being summoned after being summoned; useful to prevent ping-pong summons")
-RULE_BOOL(Combat, PreventCastingWhenBlind, true, "Prevent players from casting spells while blinded. Default: true")
+RULE_BOOL(Combat, PreventCastingWhenBlind, true, "Prevent players from casting spells and using discs while blinded (SE 527). Default: true")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(NPC)

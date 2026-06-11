@@ -3147,6 +3147,15 @@ void Mob::ApplySpellsBonuses(uint16 spell_id, uint8 casterlevel, StatBonuses *ne
 				new_bonus->IsBlind = true;
 				break;
 
+			case SpellEffect::BlindNew:
+				if (!RuleB(Combat, AllowRaidTargetBlind) && IsRaidTarget()) { // do not blind raid targets
+					break;
+				}
+
+				new_bonus->IsBlind = true;
+				new_bonus->IsBlindNew = true;
+				break;
+
 			case SpellEffect::Fear:
 				new_bonus->IsFeared = true;
 				break;
@@ -5100,6 +5109,10 @@ void Mob::NegateSpellEffectBonuses(uint16 spell_id)
 
 				case SpellEffect::Blind:
 					if (negate_spellbonus) { spellbonuses.IsBlind = false; }
+					break;
+
+				case SpellEffect::BlindNew:
+					if (negate_spellbonus) { spellbonuses.IsBlind = false; spellbonuses.IsBlindNew = false; }
 					break;
 
 				case SpellEffect::Fear:

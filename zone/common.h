@@ -391,6 +391,9 @@ struct StatBonuses {
 	bool	Fearless;							//i
 	bool	IsFeared;							//i
 	bool	IsBlind;							//i
+	bool	IsBlindNew;						//i (BlindNew SPA)
+
+
 	int32	StunResist;							//i
 	int32	MeleeSkillCheck;					//i
 	uint8	MeleeSkillCheckSkill;
