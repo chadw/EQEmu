@@ -97,6 +97,53 @@ void ZoneDatabase::ZDBInitVars() {
 	faction_array = nullptr;
 }
 
+bool ZoneDatabase::SaveCharacterIllusion(uint32 character_id, uint32 spell_id, uint32 item_id, uint32 &out_illusion_id)
+{
+	// Ensure table exists (harmless if already present)
+	std::string create_sql = "CREATE TABLE IF NOT EXISTS `character_illusions` ( `id` int NOT NULL AUTO_INCREMENT, `character_id` int NOT NULL, `spell_id` int NOT NULL, `item_id` int DEFAULT 0, `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`) ) ENGINE=InnoDB";
+	QueryDatabase(create_sql);
+
+	std::string query = fmt::format("INSERT INTO `character_illusions` (`character_id`,`spell_id`,`item_id`) VALUES ({},{},{})", character_id, spell_id, item_id);
+	auto results = QueryDatabase(query);
+	if (!results.Success()) {
+		return false;
+	}
+
+	out_illusion_id = results.LastInsertedID();
+	return true;
+}
+
+bool ZoneDatabase::DeleteCharacterIllusion(uint32 character_id, uint32 illusion_id)
+{
+	std::string query = fmt::format("DELETE FROM `character_illusions` WHERE `id` = {} AND `character_id` = {}", illusion_id, character_id);
+	auto results = QueryDatabase(query);
+	if (!results.Success()) {
+		return false;
+	}
+
+	return true;
+}
+
+bool ZoneDatabase::LoadCharacterIllusions(uint32 character_id, std::vector<std::tuple<uint32,uint32,uint32>> &into)
+{
+	into.clear();
+
+	std::string query = fmt::format("SELECT `id`,`spell_id`,`item_id` FROM `character_illusions` WHERE `character_id` = {} ORDER BY `id` ASC", character_id);
+	auto results = QueryDatabase(query);
+	if (!results.Success()) {
+		return false;
+	}
+
+	for (auto row = results.begin(); row != results.end(); ++row) {
+		uint32 id = Strings::ToUnsignedInt(row[0]);
+		uint32 spell_id = Strings::ToUnsignedInt(row[1]);
+		uint32 item_id = Strings::ToUnsignedInt(row[2]);
+		into.emplace_back(id, spell_id, item_id);
+	}
+
+	return true;
+}
+
 ZoneDatabase::~ZoneDatabase() {
 	if (npc_spellseffects_cache) {
 		for (int x = 0; x <= npc_spellseffects_maxid; x++) {

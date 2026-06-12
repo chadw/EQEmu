@@ -475,6 +475,11 @@ public:
 	bool SaveCharacterSkill(uint32 character_id, uint32 skill_id, uint32 value);
 	bool SaveCharacterSpell(uint32 character_id, uint32 spell_id, uint32 slot_id);
 
+	/* Illusion Storage */
+	bool SaveCharacterIllusion(uint32 character_id, uint32 spell_id, uint32 item_id, uint32 &out_illusion_id);
+	bool DeleteCharacterIllusion(uint32 character_id, uint32 illusion_id);
+	bool LoadCharacterIllusions(uint32 character_id, std::vector<std::tuple<uint32,uint32,uint32>> &into);
+
 	void ZeroPlayerProfileCurrency(PlayerProfile_Struct* pp);
 
 	/* EXP Modifiers */
