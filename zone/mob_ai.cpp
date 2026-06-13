@@ -1161,6 +1161,13 @@ void Mob::AI_Process() {
 		bool is_combat_range = CombatRange(target);
 
 		if (is_combat_range) {
+
+			// try to reposition melee pets behind the target
+			if (IsPet()) {
+				if (TryPetRepositionBehindTarget())
+					return;
+			}
+
 			if (IsMoving()) {
 				StopNavigation();
 			}

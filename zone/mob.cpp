@@ -4819,6 +4819,52 @@ bool Mob::PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, fl
 	return Result;
 }
 
+bool Mob::TryPetRepositionBehindTarget() {
+	if (!IsPet() || !GetTarget() || IsMoving())
+		return false;
+
+	if (m_pet_reposition_timer.Enabled() && !m_pet_reposition_timer.Check())
+		return false;
+
+	Mob *target = GetTarget();
+	Mob *top = target->GetHateTop();
+	float dx = GetX() - target->GetX();
+	float dy = GetY() - target->GetY();
+	float cur_dist = sqrtf(dx*dx + dy*dy);
+	float calc_dist = CalculateCombatRange(target);
+	float size_based = target->GetSize() + GetSize() + 5.0f;
+	float desired_dist = std::max(calc_dist, size_based) + 3.0f;
+
+	if (BehindMob(target, GetX(), GetY()) && cur_dist >= 5.0f)
+		return false;
+
+	if (top == this)
+		return false;
+
+	float newX = 0.0f, newY = 0.0f, newZ = 0.0f;
+	bool lookForAftArc = (GetArchetype() != Archetype::Caster);
+	if (!PlotPositionAroundTarget(target, newX, newY, newZ, lookForAftArc)) {
+		return false;
+	}
+
+	bool zero_speeds = (GetWalkspeed() == 0 && GetRunspeed() == 0);
+	SetPetStop(false);
+	SetHeld(false);
+	SetFeigned(false);
+	SetRunAnimSpeed(8);
+	SetRunning(true);
+	SetRunspeed(2.0f);
+
+	if (IsPet()) {
+		SendTo(newX, newY, newZ);
+	} else {
+		RunTo(newX, newY, newZ);
+	}
+
+	m_pet_reposition_timer.Start(1500);
+	return true;
+}
+
 bool Mob::HateSummon() {
 	// check if mob has ability to summon
 	// 97% is the offical % that summoning starts on live, not 94

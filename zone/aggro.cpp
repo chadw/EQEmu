@@ -1249,6 +1249,99 @@ bool Mob::CombatRange(Mob* other, float fixed_size_mod, bool aeRampage, ExtraAtt
 	return false;
 }
 
+float Mob::CalculateCombatRange(Mob* other, float fixed_size_mod, bool aeRampage, ExtraAttackOptions *opts) {
+	if (!other) {
+		return 0.0f;
+	}
+
+	float size_mod = GetSize();
+	float other_size_mod = other->GetSize();
+
+	if (GetRace() == Race::LavaDragon || GetRace() == Race::Wurm || GetRace() == Race::GhostDragon) {
+		size_mod = 60.0f;
+	}
+	else if (size_mod < 6.0f) {
+		size_mod = 8.0f;
+	}
+
+	if (other->GetRace() == Race::LavaDragon || other->GetRace() == Race::Wurm || other->GetRace() == Race::GhostDragon) {
+		other_size_mod = 60.0f;
+	}
+	else if (other_size_mod < 6.0f) {
+		other_size_mod = 8.0f;
+	}
+
+	if (other_size_mod > size_mod) {
+		size_mod = other_size_mod;
+	}
+
+	if (size_mod > 29) {
+		size_mod *= size_mod;
+	} else if (size_mod > 19) {
+		size_mod *= size_mod * 2;
+	} else {
+		size_mod *= size_mod * 4;
+	}
+
+	if (other->GetRace() == Race::VeliousDragon) {
+		size_mod *= 1.75;
+	}
+	if (other->GetRace() == Race::DragonSkeleton) {
+		size_mod *= 2.25;
+	}
+
+	size_mod *= RuleR(Combat,HitBoxMod);
+	size_mod *= fixed_size_mod;
+
+	if  (other->currently_fleeing && !other->IsBlind()) {
+		size_mod *= 3;
+	}
+
+	if (size_mod > 10000) {
+		size_mod = size_mod / 7;
+	}
+
+	if (GetSpecialAbility(SpecialAbility::NPCChaseDistance)) {
+		float max_dist = static_cast<float>(GetSpecialAbilityParam(SpecialAbility::NPCChaseDistance, 0));
+		float min_distance = static_cast<float>(GetSpecialAbilityParam(SpecialAbility::NPCChaseDistance, 1));
+
+		if (max_dist == 1) {
+			max_dist = 250.0f;
+		}
+
+		max_dist = max_dist * max_dist;
+
+		if (!min_distance) {
+			min_distance = size_mod;
+		} else {
+			min_distance = min_distance * min_distance;
+		}
+
+		return sqrtf(max_dist);
+	}
+
+	if (aeRampage) {
+		float aeramp_size = RuleR(Combat, AERampageMaxDistance);
+
+		if (opts) {
+			if (opts->range_percent > 0) {
+				aeramp_size = opts->range_percent;
+			}
+		}
+
+		if (aeramp_size <= 0) {
+			aeramp_size = 0.90f;
+		} else {
+			aeramp_size /= 100.0f;
+		}
+
+		float ramp_range_sq = size_mod * aeramp_size;
+		return sqrtf(ramp_range_sq);
+	}
+
+	return sqrtf(size_mod);
+}
+
 bool Mob::CheckLosFN(Mob *other)
 {
 	bool Result = false;

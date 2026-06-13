@@ -221,6 +221,7 @@ public:
 	Timer                              m_scan_close_mobs_timer;
 	Timer                              m_see_close_mobs_timer;
 	Timer                              m_mob_check_moving_timer;
+    Timer                              m_pet_reposition_timer;
 
 	uint16 m_last_wearchange_race_id = 0;
 	// client_id -> slot_id -> key
@@ -285,6 +286,7 @@ public:
 	void MeleeMitigation(Mob *attacker, DamageHitInfo &hit, ExtraAttackOptions *opts = nullptr);
 	double RollD20(int offense, int mitigation); // CALL THIS FROM THE DEFENDER
 	bool CombatRange(Mob* other, float fixed_size_mod = 1.0, bool aeRampage = false, ExtraAttackOptions *opts = nullptr);
+	float CalculateCombatRange(Mob* other, float fixed_size_mod = 1.0, bool aeRampage = false, ExtraAttackOptions *opts = nullptr);
 	virtual inline bool IsBerserk() { return false; } // only clients
 	void RogueEvade(Mob *other);
 	void CommonOutgoingHitSuccess(Mob *defender, DamageHitInfo &hit, ExtraAttackOptions *opts = nullptr);
@@ -755,6 +757,7 @@ public:
 	float GetMovespeed() const { return IsRunning() ? GetRunspeed() : GetWalkspeed(); }
 	bool IsRunning() const { return m_is_running; }
 	void SetRunning(bool val) { m_is_running = val; }
+	inline void SetRunspeed(float val) { runspeed = val; }
 	float GetCurrentSpeed() { return current_speed; }
 	virtual void GMMove(float x, float y, float z, float heading = 0.01, bool save_guard_spot = true);
 	virtual void GMMove(const glm::vec4 &position, bool save_guard_spot = true);
@@ -1079,7 +1082,7 @@ public:
 	inline const int GetAnimation() const { return animation; }
 	inline void SetAnimation(int a) { animation = a; }
 	inline const uint8 GetRunAnimSpeed() const { return pRunAnimSpeed; }
-	inline void SetRunAnimSpeed(int8 in) { pRunAnimSpeed = in; }
+	inline void SetRunAnimSpeed(int8 in) { if (in == 0 && IsPet()) { pRunAnimSpeed = 8; } else { pRunAnimSpeed = in; } }
 	bool IsDestructibleObject() { return destructibleobject; }
 	void SetDestructibleObject(bool in) { destructibleobject = in; }
 
@@ -1099,6 +1102,7 @@ public:
 
 	Mob* GetPet();
 	void SetPet(Mob* newpet);
+	bool TryPetRepositionBehindTarget();
 	virtual Mob* GetOwner();
 	virtual Mob* GetOwnerOrSelf();
 	Mob* GetUltimateOwner();
