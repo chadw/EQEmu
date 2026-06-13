@@ -4861,7 +4861,7 @@ bool Mob::TryPetRepositionBehindTarget() {
 		RunTo(newX, newY, newZ);
 	}
 
-	m_pet_reposition_timer.Start(1500);
+	m_pet_reposition_timer.Start(3000);
 	return true;
 }
 
