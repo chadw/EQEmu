@@ -7540,7 +7540,7 @@ void Client::UpdateClientXTarget(Client *c)
 // IT IS NOT SAFE TO CALL THIS IF IT'S NOT INITIAL AGGRO
 void Client::AddAutoXTarget(Mob *m, bool send)
 {
-	if (m->IsBot() || ((m->IsPet() || m->IsTempPet()) && m->IsPetOwnerBot())) {
+	if (!m || m->IsCorpse() || m->IsBot() || ((m->IsPet() || m->IsTempPet()) && m->IsPetOwnerBot())) {
 		return;
 	}
 
@@ -7579,13 +7579,23 @@ void Client::RemoveXTarget(Mob *m, bool OnlyAutoSlots)
 	}
 
 	m_activeautohatermgr->decrement_count(m);
+
 	// now we may need to clean up our CurrentTargetNPC entries
+	bool found = false;
 	for (int i = 0; i < GetMaxXTargets(); ++i) {
-		if (XTargets[i].Type == CurrentTargetNPC && XTargets[i].ID == m->GetID()) {
-			XTargets[i].Type  = Auto;
-			XTargets[i].ID    = 0;
-			XTargets[i].dirty = true;
+		if (XTargets[i].ID != m->GetID())
+			continue;
+
+		if (OnlyAutoSlots) {
+			if (XTargets[i].Type != Auto)
+				continue;
 		}
+
+		XTargets[i].Type = Auto;
+		XTargets[i].ID = 0;
+		XTargets[i].Name[0] = 0;
+		XTargets[i].dirty = true;
+		found = true;
 	}
 
 	auto r = GetRaid();
@@ -7593,12 +7603,21 @@ void Client::RemoveXTarget(Mob *m, bool OnlyAutoSlots)
 		r->UpdateRaidXTargets();
 	}
 
-	LogXTargets(
-		"Removing [{}] from [{}] ({}) XTargets",
-		m->GetCleanName(),
-		GetCleanName(),
-		GetID()
-	);
+	if (found) {
+		LogXTargets(
+			"Removing [{}] from [{}] ({}) XTargets",
+			m->GetCleanName(),
+			GetCleanName(),
+			GetID()
+		);
+	} else {
+		LogXTargets(
+			"Attempted to remove [{}] from [{}] ({}) XTargets but it was not present",
+			m->GetCleanName(),
+			GetCleanName(),
+			GetID()
+		);
+	}
 }
 
 void Client::UpdateXTargetType(XTargetType Type, Mob *m, const char *Name)
@@ -7833,7 +7852,9 @@ void Client::ProcessXTargetAutoHaters()
 		auto &haters = GetXTargetAutoMgr()->get_list();
 		for (auto &e : haters) {
 			auto *mob = entity_list.GetMob(e.spawn_id);
-			if (mob && !IsXTarget(mob)) {
+			if (!mob || mob->IsCorpse())
+				continue;
+			if (!IsXTarget(mob)) {
 				auto slot = empty_slots.front();
 				empty_slots.pop();
 				XTargets[slot].dirty = true;
