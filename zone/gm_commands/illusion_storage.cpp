@@ -24,9 +24,9 @@ void command_illusion(Client *c, const Seperator *sep)
 	bool allowed = false;
 
 	if (!args || !strcasecmp(sep->arg[1], "help")) {
-		c->Message(Chat::White, "Usage: #illusion store - store an illusion from the item on your cursor (must be an illusion click effect)");
-		c->Message(Chat::White, "       #illusion list - view stored illusions");
-		c->Message(Chat::White, "       #illusion use <id> - cast a stored illusion by id (useful for macros)");
+		c->Message(Chat::White, "#illusion store - store an illusion from the item on your cursor (must be an illusion click effect)");
+		c->Message(Chat::White, "#illusion list - view stored illusions");
+		c->Message(Chat::White, "#illusion use <id> - cast a stored illusion by id (useful for macros)");
 		return;
 	}
 
@@ -37,7 +37,7 @@ void command_illusion(Client *c, const Seperator *sep)
 		bool removed_from_cursor = false;
 		const EQ::ItemInstance *cursor_inst = c->GetInv().GetItem(EQ::invslot::slotCursor);
 		if (!cursor_inst || !cursor_inst->GetItem()) {
-			c->Message(Chat::White, "Place an illusion-click item on your cursor and run: #illusion store");
+			c->Message(Chat::White, "Place an illusion item on your cursor and run: #illusion store");
 			return;
 		}
 
@@ -68,6 +68,7 @@ void command_illusion(Client *c, const Seperator *sep)
 		}
 
 		c->Message(Chat::Green, "Stored illusion id %u for spell %u (item %u).", new_id, spell_id, item_id);
+		LogInfo("Character [{}] stored illusion record id={} item={}", c->GetName(), new_id, item_id);
 		return;
 	}
 
@@ -160,6 +161,8 @@ void command_illusion(Client *c, const Seperator *sep)
 			c->Message(Chat::Yellow, "Failed to cast illusion %u.", spell_id);
 			return;
 		}
+
+		LogInfo("Character [{}] used stored illusion id={} item={}", c->GetName(), want_id, item_id);
 
 		if (item && item->RecastDelay > 0) {
 			c->SetItemCooldown(item->ID, false, item->RecastDelay);
@@ -262,12 +265,15 @@ void command_illusion(Client *c, const Seperator *sep)
 				const EQ::ItemData *it = database.GetItem(item_id);
 				const char *name = it ? it->Name : "<unknown item>";
 				c->Message(Chat::Yellow, "Retrieved %s into inventory, but failed to remove storage record. Manual cleanup may be required.", name);
-
+				LogInfo("Character [{}] failed to remove illusion record id={} item={} from storage", c->GetName(), want_id, item_id);
 				return;
 			}
+
+			LogInfo("Character [{}] retrieved illusion id={} item={}", c->GetName(), want_id, item_id);
 		} else {
 			if (!database.DeleteCharacterIllusion(c->CharacterID(), want_id)) {
 				c->Message(Chat::Yellow, "Failed to retrieve illusion %u.", want_id);
+				LogInfo("Character [{}] failed to remove illusion record id={} from storage", c->GetName(), want_id);
 				return;
 			}
 		}
@@ -275,6 +281,7 @@ void command_illusion(Client *c, const Seperator *sep)
 		const EQ::ItemData *got_item = item_id ? database.GetItem(item_id) : nullptr;
 		const char *got_name = got_item ? got_item->Name : GetSpellName(spell_id_for_record);
 		c->Message(Chat::Green, "Retrieved from illusion storage - %s.", got_name);
+		LogInfo("Character [{}] retrieved illusion id={} item={} name={}", c->GetName(), want_id, item_id, got_name);
 		return;
 	}
 
