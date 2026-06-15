@@ -335,6 +335,27 @@ bool EQ::ItemInstance::IsAugmentSlotAvailable(int32 augment_type, uint8 slot) co
 	);
 }
 
+bool EQ::ItemInstance::IsAugmentSlotCompatible(int32 augment_type, uint8 slot) const {
+	if (!m_item || !m_item->IsClassCommon()) {
+		return false;
+	}
+
+	if (slot >= invaug::SOCKET_COUNT) {
+		return false;
+	}
+
+	return (
+		(augment_type == -1) ||
+		(
+			m_item->AugSlotType[slot] &&
+			((1 << (m_item->AugSlotType[slot] - 1)) & augment_type)
+		)
+	) && (
+		RuleB(Items, AugmentItemAllowInvisibleAugments) ||
+		m_item->AugSlotVisible[slot]
+	);
+}
+
 // Retrieve item inside container
 EQ::ItemInstance* EQ::ItemInstance::GetItem(uint8 index) const
 {
