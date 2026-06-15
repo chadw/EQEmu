@@ -46,8 +46,11 @@ void command_lootsim(Client *c, const Seperator *sep)
 			for (int i = 0; i < iterations; i++) {
 				npc->AddLootTable(loottable_id);
 
-				for (auto &id: zone->GetGlobalLootTables(npc)) {
-					npc->AddLootTable(id);
+				// skip global loot if npc is flagged to skip it
+				if (!npc_type->skip_global_loot) {
+					for (auto &id: zone->GetGlobalLootTables(npc)) {
+						npc->AddLootTable(id);
+					}
 				}
 			}
 
@@ -121,68 +124,70 @@ void command_lootsim(Client *c, const Seperator *sep)
 				}
 			}
 
-			// global loot
-			auto tables = zone->GetGlobalLootTables(npc);
-			if (!tables.empty()) {
-				c->SendChatLineBreak();
-				c->Message(Chat::White, "# [Loot Simulator] Global Loot");
-			}
-
-			for (auto &id: tables) {
-				c->SendChatLineBreak();
-				c->Message(Chat::White, fmt::format("# Global Loot Table ID [{}]", id).c_str());
-				c->SendChatLineBreak();
-
-				loot_table = zone->GetLootTable(id);
-				if (!loot_table) {
-					c->Message(Chat::Red, fmt::format("Global Loot table not found [{}]", id).c_str());
-					continue;
+			// global loot unless npc is flagged to skip it
+			if (!npc_type->skip_global_loot) {
+				auto tables = zone->GetGlobalLootTables(npc);
+				if (!tables.empty()) {
+					c->SendChatLineBreak();
+					c->Message(Chat::White, "# [Loot Simulator] Global Loot");
 				}
 
-				le = zone->GetLootTableEntries(id);
+				for (auto &id: tables) {
+					c->SendChatLineBreak();
+					c->Message(Chat::White, fmt::format("# Global Loot Table ID [{}]", id).c_str());
+					c->SendChatLineBreak();
 
-				// translate above for loop using loot_table_entries
-				for (auto &e: le) {
-					c->Message(
-						Chat::White,
-						fmt::format(
-							"# Lootdrop ID [{}] drop_limit [{}] min_drop [{}] mult [{}] probability [{}]",
-							e.lootdrop_id,
-							e.droplimit,
-							e.mindrop,
-							e.multiplier,
-							e.probability
-						).c_str()
-					);
-
-					auto loot_drop = zone->GetLootdrop(e.lootdrop_id);
-					if (!loot_drop.id) {
+					loot_table = zone->GetLootTable(id);
+					if (!loot_table) {
+						c->Message(Chat::Red, fmt::format("Global Loot table not found [{}]", id).c_str());
 						continue;
 					}
 
-					auto loot_drop_entries = zone->GetLootdropEntries(e.lootdrop_id);
-					for (auto &f: loot_drop_entries) {
-						int                rolled_count = npc->GetRolledItemCount(f.item_id);
-						const EQ::ItemData *item        = database.GetItem(f.item_id);
+					le = zone->GetLootTableEntries(id);
 
-						EQ::SayLinkEngine linker;
-						linker.SetLinkType(EQ::saylink::SayLinkItemData);
-						linker.SetItemData(item);
-
-						auto rolled_percentage = (float) ((float) ((float) rolled_count / (float) iterations) * 100);
-
+					// translate above for loop using loot_table_entries
+					for (auto &e: le) {
 						c->Message(
 							Chat::White,
 							fmt::format(
-								"-- lootdrop_id [{}] item_id [{}] chance [{}] rolled_count [{}] ({:.2f}%) name [{}]",
-								f.lootdrop_id,
-								f.item_id,
-								f.chance,
-								rolled_count,
-								rolled_percentage,
-								linker.GenerateLink()
+								"# Lootdrop ID [{}] drop_limit [{}] min_drop [{}] mult [{}] probability [{}]",
+								e.lootdrop_id,
+								e.droplimit,
+								e.mindrop,
+								e.multiplier,
+								e.probability
 							).c_str()
 						);
+
+						auto loot_drop = zone->GetLootdrop(e.lootdrop_id);
+						if (!loot_drop.id) {
+							continue;
+						}
+
+						auto loot_drop_entries = zone->GetLootdropEntries(e.lootdrop_id);
+						for (auto &f: loot_drop_entries) {
+							int                rolled_count = npc->GetRolledItemCount(f.item_id);
+							const EQ::ItemData *item        = database.GetItem(f.item_id);
+
+							EQ::SayLinkEngine linker;
+							linker.SetLinkType(EQ::saylink::SayLinkItemData);
+							linker.SetItemData(item);
+
+							auto rolled_percentage = (float) ((float) ((float) rolled_count / (float) iterations) * 100);
+
+							c->Message(
+								Chat::White,
+								fmt::format(
+									"-- lootdrop_id [{}] item_id [{}] chance [{}] rolled_count [{}] ({:.2f}%) name [{}]",
+									f.lootdrop_id,
+									f.item_id,
+									f.chance,
+									rolled_count,
+									rolled_percentage,
+									linker.GenerateLink()
+								).c_str()
+							);
+						}
 					}
 				}
 			}
