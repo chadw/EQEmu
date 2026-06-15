@@ -192,12 +192,11 @@ void command_lootsim(Client *c, const Seperator *sep)
 				}
 			}
 
-
 			c->SendChatLineBreak();
 			c->Message(
 				Chat::White,
 				fmt::format(
-					"# Global Loot Benchmark End [{}] iterations took [{}](s)",
+					"# Loot Benchmark End [{}] iterations took [{}](s)",
 					iterations,
 					benchmark.elapsed()
 				).c_str()
