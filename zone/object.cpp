@@ -50,7 +50,8 @@ Object::Object(
 	bool fix_z
 ) :
 respawn_timer(0),
-decay_timer(300000)
+decay_timer(RuleI(Groundspawns, DecayTime)),
+random_timer(0)
 {
 	user      = nullptr;
 	last_user = nullptr;
@@ -60,6 +61,7 @@ decay_timer(300000)
 	m_type         = type;
 	m_icon         = icon;
 	m_fix_z        = fix_z;
+	m_ground_spawn_z = 0.0f;
 	m_inst         = nullptr;
 	m_ground_spawn = false;
 
@@ -75,6 +77,7 @@ decay_timer(300000)
 	memset(m_display_name, 0, sizeof(m_display_name));
 
 	respawn_timer.Disable();
+	random_timer.Disable();
 
 	// Set drop_id to zero - it will be set when added to zone with SetID()
 	m_data.drop_id = 0;
@@ -82,7 +85,7 @@ decay_timer(300000)
 	m_data.tilt_x  = object.tilt_x;
 	m_data.tilt_y  = object.tilt_y;
 
-	if (!IsFixZEnabled()) {
+	if (IsFixZEnabled()) {
 		FixZ();
 	}
 }
@@ -101,7 +104,8 @@ Object::Object(
 	bool fix_z
 ) :
 respawn_timer(respawn_timer_ * 1000),
-decay_timer(300000)
+decay_timer(RuleI(Groundspawns, DecayTime)),
+random_timer(respawn_timer)
 {
 
 	user           = nullptr;
@@ -110,6 +114,7 @@ decay_timer(300000)
 	m_max_y        = max_y;
 	m_min_x        = min_x;
 	m_min_y        = min_y;
+	m_ground_spawn_z = z;
 	m_id           = 0;
 	m_inst         = (inst) ? inst->Clone() : nullptr;
 	m_type         = ObjectTypes::Temporary;
@@ -128,12 +133,18 @@ decay_timer(300000)
 	m_data.zone_id = zone->GetZoneID();
 
 	respawn_timer.Disable();
+	if (!RuleB(Groundspawns, RandomSpawn) || m_min_x == m_max_x || m_min_y == m_max_y) {
+		random_timer.Disable();
+	}
+	else {
+		random_timer.Start();
+	}
 
 	strcpy(m_data.object_name, name.c_str());
 
 	RandomSpawn(false);
 
-	if (!IsFixZEnabled()) {
+	if (IsFixZEnabled()) {
 		FixZ();
 	}
 
@@ -149,7 +160,8 @@ Object::Object(
 	const EQ::ItemInstance* inst
 ) :
 respawn_timer(0),
-decay_timer(300000)
+decay_timer(RuleI(Groundspawns, DecayTime)),
+random_timer(0)
 {
 	user = nullptr;
 	last_user = nullptr;
@@ -159,6 +171,7 @@ decay_timer(300000)
 	m_inst         = (inst) ? inst->Clone() : nullptr;
 	m_type         = ObjectTypes::Temporary;
 	m_icon         = 0;
+	m_ground_spawn_z = 0.0f;
 	m_ground_spawn = false;
 	m_fix_z        = false;
 
@@ -182,6 +195,7 @@ decay_timer(300000)
 
 	decay_timer.Start();
 	respawn_timer.Disable();
+	random_timer.Disable();
 
 	// Hardcoded portion for unknown members
 	m_data.unknown024 = 0x7f001194;
@@ -223,7 +237,8 @@ Object::Object(
 	bool fix_z
 ) :
 respawn_timer(0),
-decay_timer(decay_time)
+decay_timer(decay_time),
+random_timer(0)
 {
 	user      = nullptr;
 	last_user = nullptr;
@@ -233,6 +248,7 @@ decay_timer(decay_time)
 	m_inst         = (inst) ? inst->Clone() : nullptr;
 	m_type         = ObjectTypes::Temporary;
 	m_icon         = 0;
+	m_ground_spawn_z = 0.0f;
 	m_ground_spawn = false;
 	m_fix_z        = fix_z;
 
@@ -252,6 +268,7 @@ decay_timer(decay_time)
 	}
 
 	respawn_timer.Disable();
+	random_timer.Disable();
 
 	// Hardcoded portion for unknown members
 	m_data.unknown024 = 0x7f001194;
@@ -280,7 +297,7 @@ decay_timer(decay_time)
 		}
 	}
 
-	if (!IsFixZEnabled()) {
+	if (IsFixZEnabled()) {
 		FixZ();
 	}
 }
@@ -295,7 +312,8 @@ Object::Object(
 	uint32 decay_time
 ) :
 respawn_timer(0),
-decay_timer(decay_time)
+decay_timer(decay_time),
+random_timer(0)
 {
 	user      = nullptr;
 	last_user = nullptr;
@@ -307,6 +325,8 @@ decay_timer(decay_time)
 	m_inst         = inst->Clone();
 	m_type         = type;
 	m_icon         = 0;
+	m_fix_z        = true;
+	m_ground_spawn_z = 0.0f;
 	m_ground_spawn = false;
 
 	// Set as much struct data as we can
@@ -319,7 +339,7 @@ decay_timer(decay_time)
 
 	memset(m_display_name, 0, sizeof(m_display_name));
 
-	if (!IsFixZEnabled()) {
+	if (IsFixZEnabled()) {
 		FixZ();
 	}
 
@@ -328,6 +348,7 @@ decay_timer(decay_time)
 	}
 
 	respawn_timer.Disable();
+	random_timer.Disable();
 
 	// Hardcoded portion for unknown members
 	m_data.unknown024 = 0x7f001194;
@@ -367,6 +388,7 @@ void Object::ResetState()
 	m_id   = 0;
 	m_type = 0;
 	m_icon = 0;
+	m_ground_spawn_z = 0.0f;
 
 	memset(&m_data, 0, sizeof(Object_Struct));
 }
@@ -530,8 +552,28 @@ bool Object::Process(){
 		return false;
 	}
 
-	if (m_ground_spawn && respawn_timer.Check()){
-		RandomSpawn(true);
+	if (m_ground_spawn) {
+		if (respawn_timer.Enabled()) {
+			// respawn_timer is enabled if item was picked up, and waiting to respawn
+			if (respawn_timer.Check()) {
+				// when random_timer is enabled, RandomSpawn() will send a despawn packet
+				//bool rand_respawn = random_timer.Enabled();
+				bool restart_random_timer = random_timer.Enabled();
+				random_timer.Disable();
+				RandomSpawn(true);
+				respawn_timer.Disable();
+				// re-start random_timer if it was running
+				if (restart_random_timer) {
+					random_timer.Start();
+				}
+			}
+		}
+		else if (random_timer.Check()) {
+			EQApplicationPacket app;
+			CreateDeSpawnPacket(&app);
+			entity_list.QueueClients(nullptr, &app, false);
+			RandomSpawn(true);
+		}
 	}
 
 	if (user && !entity_list.GetClientByCharID(user->CharacterID())) {
@@ -552,6 +594,7 @@ void Object::RandomSpawn(bool send_packet) {
 
 	m_data.x = zone->random.Real(m_min_x, m_max_x);
 	m_data.y = zone->random.Real(m_min_y, m_max_y);
+	m_data.z = m_ground_spawn_z;
 
 	if (m_data.z == BEST_Z_INVALID && zone->HasMap()) {
 		glm::vec3 me;
@@ -566,6 +609,10 @@ void Object::RandomSpawn(bool send_packet) {
 		if (best_z != BEST_Z_INVALID) {
 			m_data.z = best_z + 0.1f;
 		}
+	}
+
+	if (IsFixZEnabled()) {
+		FixZ();
 	}
 
 	LogInfo("[{}] [{}] ([{}] [{}] [{}])", m_data.object_name, m_inst->GetID(), m_data.x, m_data.y, m_data.z);

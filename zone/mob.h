@@ -893,7 +893,7 @@ public:
 	void SendStatsWindow(Client* c, bool use_window);
 	void ShowStats(Client* client);
 	void ShowBuffs(Client* c);
-	bool PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, float &z_dest, bool lookForAftArc = true);
+	bool PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, float &z_dest, bool lookForAftArc = true, float distance = 0.0f);
 
 	virtual int GetKillExpMod() const { return 100; }
 

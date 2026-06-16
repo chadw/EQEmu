@@ -4743,7 +4743,7 @@ float Mob::GetReciprocalHeading(Mob* target) {
 	return Result;
 }
 */
-bool Mob::PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, float &z_dest, bool lookForAftArc) {
+bool Mob::PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, float &z_dest, bool lookForAftArc, float distance) {
 	bool Result = false;
 
 	if(target) {
@@ -4766,12 +4766,12 @@ bool Mob::PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, fl
 		uint8 counter = 0;
 		float rangeReduction= 0;
 
-		tempSize = target->GetSize();
+		tempSize = distance > 0.0f ? distance : target->GetSize();
 		rangeReduction = (tempSize * rangeCreepMod);
 
 		while(tempSize > 0 && counter != maxIterationsAllowed) {
-			tempX = GetX() + (tempSize * static_cast<float>(sin(double(look_heading))));
-			tempY = GetY() + (tempSize * static_cast<float>(cos(double(look_heading))));
+			tempX = target->GetX() + (tempSize * static_cast<float>(sin(double(look_heading))));
+			tempY = target->GetY() + (tempSize * static_cast<float>(cos(double(look_heading))));
 			tempZ = target->GetZ();
 
 			if(!CheckLosFN(tempX, tempY, tempZ, tempSize)) {
@@ -4789,12 +4789,12 @@ bool Mob::PlotPositionAroundTarget(Mob* target, float &x_dest, float &y_dest, fl
 			// Try to find an attack arc to position at from the opposite direction.
 			look_heading += (3.141592 / 2);
 
-			tempSize = target->GetSize();
+			tempSize = distance > 0.0f ? distance : target->GetSize();
 			counter = 0;
 
 			while(tempSize > 0 && counter != maxIterationsAllowed) {
-				tempX = GetX() + (tempSize * static_cast<float>(sin(double(look_heading))));
-				tempY = GetY() + (tempSize * static_cast<float>(cos(double(look_heading))));
+				tempX = target->GetX() + (tempSize * static_cast<float>(sin(double(look_heading))));
+				tempY = target->GetY() + (tempSize * static_cast<float>(cos(double(look_heading))));
 				tempZ = target->GetZ();
 
 				if(!CheckLosFN(tempX, tempY, tempZ, tempSize)) {
@@ -4823,6 +4823,12 @@ bool Mob::TryPetRepositionBehindTarget() {
 	if (!IsPet() || !GetTarget() || IsMoving())
 		return false;
 
+	if (IsMezzed() || IsStunned() || IsFeared() || IsRooted())
+		return false;
+
+	if (GetPetOrder() == SPO_Sit || GetPetOrder() == SPO_FeignDeath)
+		return false;
+
 	if (m_pet_reposition_timer.Enabled() && !m_pet_reposition_timer.Check())
 		return false;
 
@@ -4838,12 +4844,12 @@ bool Mob::TryPetRepositionBehindTarget() {
 	if (BehindMob(target, GetX(), GetY()) && cur_dist >= 5.0f)
 		return false;
 
-	if (top == this)
+	if (top == this || target->GetTarget() == this)
 		return false;
 
 	float newX = 0.0f, newY = 0.0f, newZ = 0.0f;
 	bool lookForAftArc = (GetArchetype() != Archetype::Caster);
-	if (!PlotPositionAroundTarget(target, newX, newY, newZ, lookForAftArc)) {
+	if (!PlotPositionAroundTarget(target, newX, newY, newZ, lookForAftArc, desired_dist)) {
 		return false;
 	}
 
