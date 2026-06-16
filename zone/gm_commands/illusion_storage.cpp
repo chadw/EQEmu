@@ -55,6 +55,21 @@ void command_illusion(Client *c, const Seperator *sep)
 		spell_id = item->Click.Effect;
 		removed_from_cursor = true;
 
+		// Prevent storing duplicate items in illusion storage for this character
+		if (item_id) {
+			std::vector<std::tuple<uint32, uint32, uint32>> existing;
+			if (database.LoadCharacterIllusions(c->CharacterID(), existing)) {
+				for (auto &t : existing) {
+					uint32 eid, esid, eiid;
+					std::tie(eid, esid, eiid) = t;
+					if (eiid && eiid == item_id) {
+						c->Message(Chat::Yellow, "That item is already stored in your illusion storage (id %u).", eid);
+						return;
+					}
+				}
+			}
+		}
+
 		uint32 new_id = 0;
 		if (!database.SaveCharacterIllusion(c->CharacterID(), spell_id, item_id, new_id)) {
 			c->Message(Chat::Yellow, "Failed to store illusion.");
@@ -213,20 +228,30 @@ void command_illusion(Client *c, const Seperator *sep)
 					bool has = false;
 					if (item->LoreFlag) {
 						// look for the exact item id
-						if (c->GetInv().HasItem(item_id, 1, where_mask) != INVALID_INDEX) {
+						int16 slot_found = c->GetInv().HasItem(item_id, 1, where_mask);
+						if (slot_found != INVALID_INDEX) {
 							has = true;
+							c->Message(Chat::Yellow, "Cannot retrieve stored illusion: you already possess the lore item in your inventory/bank (found in slot %d).", slot_found);
+							return;
 						}
 					}
 
 					if (!has && item->LoreGroup != 0) {
-						if (c->GetInv().HasItemByLoreGroup(item->LoreGroup, where_mask) != INVALID_INDEX) {
-							has = true;
+						if (item->LoreGroup == -1) {
+							int16 slot_found = c->GetInv().HasItem(item_id, 1, ~invWhereSharedBank);
+							if (slot_found != INVALID_INDEX) {
+								has = true;
+								c->Message(Chat::Yellow, "Cannot retrieve stored illusion: you already possess the lore item in your inventory/bank (found in slot %d).", slot_found);
+								return;
+							}
+						} else {
+							int16 slot_found = c->GetInv().HasItemByLoreGroup(item->LoreGroup, where_mask);
+							if (slot_found != INVALID_INDEX) {
+								has = true;
+								c->Message(Chat::Yellow, "Cannot retrieve stored illusion: you already possess the lore group item in your inventory/bank (found in slot %d).", slot_found);
+								return;
+							}
 						}
-					}
-
-					if (has) {
-						c->Message(Chat::Yellow, "Cannot retrieve stored illusion: you already possess the lore item in your inventory/bank.");
-						return;
 					}
 				}
 			}
