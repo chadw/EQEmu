@@ -336,10 +336,12 @@ bool Group::AddMember(Mob* new_member, std::string new_member_name, uint32 chara
 			}
 		}
 
-		Group* g = new_member->CastToClient()->GetGroup();
-		if (g) {
-			g->SendHPManaEndPacketsTo(new_member);
-			g->SendHPPacketsFrom(new_member);
+		if (new_member->IsClient()) {
+			Group* g = new_member->CastToClient()->GetGroup();
+			if (g) {
+				g->SendHPManaEndPacketsTo(new_member);
+				g->SendHPPacketsFrom(new_member);
+			}
 		}
 
 	} else {
@@ -558,6 +560,9 @@ void Group::MemberZoned(Mob* removemob) {
 	for (auto & m : members) {
 		if (m) {
 			if (m->IsBot() && m->CastToBot()->GetBotOwner() && m->CastToBot()->GetBotOwner() == removemob) {
+				m = nullptr;
+			}
+			else if (m->IsMerc() && m->CastToMerc()->GetMercenaryOwner() && m->CastToMerc()->GetMercenaryOwner() == removemob) {
 				m = nullptr;
 			}
 			else if (m == removemob) {
@@ -2645,6 +2650,35 @@ void Group::AddToGroup(AddToGroupRequest r)
 		}
 
 		name = r.mob->GetCleanName();
+	}
+
+	if (character_id) {
+		GroupIdRepository::DeleteWhere(
+			database,
+			fmt::format(
+				"`character_id` = {} AND `bot_id` = 0 AND `merc_id` = 0 AND `group_id` != {}",
+				character_id,
+				GetID()
+			)
+		);
+	} else if (bot_id) {
+		GroupIdRepository::DeleteWhere(
+			database,
+			fmt::format(
+				"`bot_id` = {} AND `group_id` != {}",
+				bot_id,
+				GetID()
+			)
+		);
+	} else if (merc_id) {
+		GroupIdRepository::DeleteWhere(
+			database,
+			fmt::format(
+				"`merc_id` = {} AND `group_id` != {}",
+				merc_id,
+				GetID()
+			)
+		);
 	}
 
 	GroupIdRepository::ReplaceOne(

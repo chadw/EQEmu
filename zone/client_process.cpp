@@ -157,7 +157,9 @@ bool Client::Process() {
 		}
 
 		if (linkdead_timer.Check()) {
-			LeaveGroup();
+			if (GetGroup()) {
+				GetGroup()->MemberZoned(this);
+			}
 			Save();
 			if (GetMerc()) {
 				GetMerc()->Save();
@@ -195,7 +197,9 @@ bool Client::Process() {
 			if (myraid) {
 				myraid->MemberZoned(this);
 			}
-			LeaveGroup();
+			if (GetGroup()) {
+				GetGroup()->MemberZoned(this);
+			}
 			Save();
 			if (IsInAGuild()) {
 				guild_mgr.UpdateDbMemberOnline(CharacterID(), false);
@@ -581,10 +585,10 @@ bool Client::Process() {
 	}
 
 	if (client_state != CLIENT_LINKDEAD && !eqs->CheckState(ESTABLISHED)) {
-		OnDisconnect(true);
 		LogInfo("Client linkdead: {}", name);
 
 		if (Admin() > AccountStatus::GMAdmin) {
+			OnDisconnect(true);
 			if (GetMerc()) {
 				GetMerc()->Save();
 				GetMerc()->Depop();
@@ -597,12 +601,8 @@ bool Client::Process() {
 			return false;
 		}
 		else if (!linkdead_timer.Enabled()) {
-			linkdead_timer.Start(RuleI(Zone, ClientLinkdeadMS));
-			client_state = CLIENT_LINKDEAD;
-			AI_Start(CLIENT_LD_TIMEOUT);
-			SendAppearancePacket(AppearanceType::Linkdead, 1);
-
-			SetDynamicZoneMemberStatus(DynamicZoneMemberStatus::LinkDead);
+			LinkDead();
+			OnDisconnect(false);
 		}
 	}
 
@@ -636,7 +636,7 @@ bool Client::Process() {
 				if (!bZoning)
 				{
 					entity_list.MessageGroup(this, true, 15, "%s logged out.", GetName());
-					LeaveGroup();
+					mygroup->MemberZoned(this);
 				}
 				else
 				{
@@ -670,7 +670,7 @@ bool Client::Process() {
 		{
 			LinkDead();
 		}
-		OnDisconnect(true);
+		OnDisconnect(IsLD() ? false : true);
 	}
 	// Feign Death 2 minutes and zone forgets you
 	if (forget_timer.Check()) {
@@ -692,7 +692,11 @@ bool Client::Process() {
 /* Just a set of actions preformed all over in Client::Process */
 void Client::OnDisconnect(bool hard_disconnect) {
 	if (hard_disconnect) {
-		LeaveGroup();
+		if (!IsLD()) {
+			if (Group* group = GetGroup()) {
+				group->MemberZoned(this);
+			}
+		}
 
 		if (GetMerc()) {
 			GetMerc()->Save();
@@ -706,7 +710,7 @@ void Client::OnDisconnect(bool hard_disconnect) {
 		}
 	}
 
-	if (!bZoning) {
+	if (!bZoning && !IsLD()) {
 		SetDynamicZoneMemberStatus(DynamicZoneMemberStatus::Offline);
 	}
 
@@ -742,7 +746,9 @@ void Client::OnDisconnect(bool hard_disconnect) {
 
 	RecordStats();
 
-	Disconnect();
+	if (!IsLD()) {
+		Disconnect();
+	}
 }
 
 // Sends the client complete inventory used in character login

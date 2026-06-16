@@ -1581,7 +1581,7 @@ void Client::Handle_Connect_OP_ZoneEntry(const EQApplicationPacket *app)
 	KeyRingLoad();
 
 	/* Send Group Members via PP */
-	uint32 groupid = database.GetGroupID(GetName());
+	uint32 groupid = database.GetGroupIDByCharID(CharacterID());
 	Group* group = nullptr;
 	if (groupid > 0) {
 		group = entity_list.GetGroupByID(groupid);
@@ -1636,6 +1636,10 @@ void Client::Handle_Connect_OP_ZoneEntry(const EQApplicationPacket *app)
 		group->SetGroupMentor(mentor_percent, mentoree_name);
 		JoinGroupXTargets(group);
 		group->UpdatePlayer(this);
+		if (ingame && ClientVersion() >= EQ::versions::ClientVersion::SoD) {
+			SendGroupJoinAcknowledge();
+			SendGroupLeaderChangePacket(ln);
+		}
 		LFG = false;
 	}
 

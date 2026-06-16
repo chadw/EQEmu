@@ -1183,7 +1183,7 @@ void WorldServer::HandleMessage(uint16 opcode, const EQ::Net::Packet &p)
 			break;
 		}
 
-		uint32 groupid = database.GetGroupID(client->GetName());
+		uint32 groupid = database.GetGroupIDByCharID(client->CharacterID());
 
 		Group* group = nullptr;
 

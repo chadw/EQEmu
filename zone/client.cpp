@@ -765,9 +765,19 @@ Client::~Client() {
 	if(GetTarget())
 		GetTarget()->IsTargeted(-1);
 
-	//if we are in a group and we are not zoning, force leave the group
-	if(isgrouped && !bZoning && is_zone_loaded)
-		LeaveGroup();
+	//if we are in a group, just flag us zoned/null-pointer in memory so we stay in the group
+	if(isgrouped && is_zone_loaded) {
+		if (GetGroup()) {
+			GetGroup()->MemberZoned(this);
+		}
+	}
+
+	if (is_zone_loaded) {
+		Raid *myraid = GetRaid();
+		if (myraid) {
+			myraid->MemberZoned(this);
+		}
+	}
 
 	UpdateWho(2);
 
@@ -4078,11 +4088,6 @@ void Client::LinkDead()
 	if (GetGroup())
 	{
 		entity_list.MessageGroup(this,true,15,"%s has gone linkdead.",GetName());
-		GetGroup()->DelMember(this);
-		if (GetMerc())
-		{
-			GetMerc()->RemoveMercFromGroup(GetMerc(), GetMerc()->GetGroup());
-		}
 	}
 	Raid *raid = entity_list.GetRaidByClient(this);
 	if(raid){

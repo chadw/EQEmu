@@ -37,7 +37,6 @@
 #include "common/random.h"
 #include "common/repositories/account_repository.h"
 #include "common/repositories/character_data_repository.h"
-#include "common/repositories/group_id_repository.h"
 #include "common/repositories/inventory_repository.h"
 #include "common/repositories/player_event_logs_repository.h"
 #include "common/rulesys.h"
@@ -932,19 +931,13 @@ bool Client::HandleEnterWorldPacket(const EQApplicationPacket *app) {
 	}
 
 	if(!is_player_zoning) {
-		GroupIdRepository::DeleteWhere(
-			database,
-			fmt::format(
-				"`character_id` = {} AND `name` = '{}'",
-				charid,
-				Strings::Escape(char_name)
-			)
-		);
+		// Keep group_id rows intact so camped or linkdead players can rejoin
+		// persistent groups when the zone loads their character data.
 		database.SetLoginFlags(charid, false, false, 1);
 	} else {
-		auto group_id = database.GetGroupID(char_name);
+		auto group_id = database.GetGroupIDByCharID(charid);
 		if (group_id) {
-			auto leader_name = database.GetGroupLeaderForLogin(char_name);
+			auto leader_name = database.GetGroupLeaderName(group_id);
 			if (!leader_name.empty()) {
 				auto pack = new EQApplicationPacket(OP_GroupUpdate, sizeof(GroupJoin_Struct));
 				auto gj = (GroupJoin_Struct*) pack->pBuffer;
