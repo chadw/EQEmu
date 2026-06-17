@@ -7548,7 +7548,7 @@ void Client::AddAutoXTarget(Mob *m, bool send)
 	if (!m) {
 		return;
 	}
-	if (m->IsCorpse() || m->IsBot() || m->IsPet() || m->IsTempPet()) {
+	if (m->IsCorpse() || m->IsBot() || ((m->IsPet() || m->IsTempPet()) && m->IsPetOwnerClient())) {
 		return;
 	}
 
