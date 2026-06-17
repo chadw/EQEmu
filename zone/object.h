@@ -245,8 +245,8 @@ protected:
 	Client *user;
 	Client *last_user;
 
-	Timer random_timer;
 	Timer respawn_timer;
+	Timer random_timer;
 	Timer decay_timer;
 	void FixZ();
 };
