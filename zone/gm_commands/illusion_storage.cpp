@@ -55,6 +55,11 @@ void command_illusion(Client *c, const Seperator *sep)
 		spell_id = item->Click.Effect;
 		removed_from_cursor = true;
 
+		if (item->MaxCharges >= 1) {
+			c->Message(Chat::Yellow, "Cannot store item with limited charges in illusion storage.");
+			return;
+		}
+
 		// Prevent storing duplicate items in illusion storage for this character
 		if (item_id) {
 			std::vector<std::tuple<uint32, uint32, uint32>> existing;
