@@ -41,7 +41,7 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 	const std::string reason = sep->arg[3] ? sep->argplus[3] : "";
 
 	auto l = AccountRepository::GetWhere(
-		content_db,
+		database,
 		fmt::format(
 			"LOWER(charname) IN ({})",
 			Strings::Implode(", ", v)
@@ -58,7 +58,7 @@ void command_suspendmulti(Client *c, const Seperator *sep)
 		a.suspendeduntil = (days ? static_cast<time_t>(std::time(nullptr) + (static_cast<time_t>(days) * 86400)) : 0);
 		a.suspend_reason = reason;
 
-		if (!AccountRepository::UpdateOne(content_db, a)) {
+		if (!AccountRepository::UpdateOne(database, a)) {
 			c->Message(
 				Chat::White,
 				fmt::format(
