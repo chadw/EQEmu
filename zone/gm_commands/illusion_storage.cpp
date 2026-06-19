@@ -48,9 +48,23 @@ void command_illusion(Client *c, const Seperator *sep)
 			return;
 		}
 
+		bool is_whitelisted = false;
 		if (item->Click.Effect == 0 || !IsIllusionSpell(item->Click.Effect)) {
-			c->Message(Chat::White, "Item on cursor does not contain an illusion click effect.");
-			return;
+			for (auto &t : Strings::Split(RuleS(Illusions, IllusionStorageWhitelistItemIDs), ",")) {
+				std::string s = Strings::Trim(t);
+				if (s.empty())
+					continue;
+				if (Strings::ToUnsignedInt(s) == item_id) {
+					is_whitelisted = true;
+					break;
+				}
+			}
+
+			if (!is_whitelisted) {
+				c->Message(Chat::White, "Item on cursor does not contain an illusion click effect.");
+				return;
+			}
+			LogInfo("Character [{}] storing whitelisted illusion item {}", c->GetName(), item_id);
 		}
 		spell_id = item->Click.Effect;
 		removed_from_cursor = true;
