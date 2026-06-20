@@ -21,6 +21,7 @@
 
 #include "common/database.h"
 #include "common/strings.h"
+#include <unordered_set>
 
 class DiscoveredItemsRepository: public BaseDiscoveredItemsRepository {
 public:
@@ -61,5 +62,32 @@ public:
      */
 
 	// Custom extended repository methods here
+	static std::unordered_set<uint32_t> GetAllItemIDs(Database& db)
+	{
+		std::unordered_set<uint32_t> item_ids;
+
+		auto results = db.QueryDatabase(
+			fmt::format(
+				"SELECT `{}` FROM {}",
+				PrimaryKey(),
+				TableName()
+			)
+		);
+
+		if (!results.Success()) {
+			LogWarning("Failed to load discovered item IDs: {}", results.ErrorMessage());
+			return item_ids;
+		}
+
+		item_ids.reserve(results.RowCount());
+
+		for (auto row = results.begin(); row != results.end(); ++row) {
+			if (row[0]) {
+				item_ids.insert(static_cast<uint32_t>(strtoul(row[0], nullptr, 10)));
+			}
+		}
+
+		return item_ids;
+	}
 
 };

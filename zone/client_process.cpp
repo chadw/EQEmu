@@ -172,7 +172,7 @@ bool Client::Process() {
 			}
 			if (IsInAGuild()) {
 				guild_mgr.UpdateDbMemberOnline(CharacterID(), false);
-				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr));
+				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr), 0);
 			}
 
 			SetDynamicZoneMemberStatus(DynamicZoneMemberStatus::Offline);
@@ -203,7 +203,7 @@ bool Client::Process() {
 			Save();
 			if (IsInAGuild()) {
 				guild_mgr.UpdateDbMemberOnline(CharacterID(), false);
-				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr));
+				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr), 0);
 			}
 
 			if (GetMerc())
@@ -572,6 +572,10 @@ bool Client::Process() {
 	}
 
 	if (client_state == DISCONNECTED) {
+		if (IsOffline()) {
+			return false;
+		}
+
 		OnDisconnect(true);
 		std::cout << "Client disconnected (cs=d): " << GetName() << std::endl;
 		RecordPlayerEventLog(PlayerEvent::POSSIBLE_HACK, PlayerEvent::PossibleHackEvent{.message = "/MQInstantCamp: Possible instant camp disconnect"});
@@ -584,7 +588,7 @@ bool Client::Process() {
 		return false;
 	}
 
-	if (client_state != CLIENT_LINKDEAD && !eqs->CheckState(ESTABLISHED)) {
+	if (eqs && client_state != CLIENT_LINKDEAD && !eqs->CheckState(ESTABLISHED)) {
 		LogInfo("Client linkdead: {}", name);
 
 		if (Admin() > AccountStatus::GMAdmin) {
@@ -595,7 +599,7 @@ bool Client::Process() {
 			}
 			if (IsInAGuild()) {
 				guild_mgr.UpdateDbMemberOnline(CharacterID(), false);
-				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr));
+				guild_mgr.SendGuildMemberUpdateToWorld(GetName(), GuildID(), 0, time(nullptr), 0);
 			}
 
 			return false;
@@ -609,7 +613,7 @@ bool Client::Process() {
 
 	/************ Get all packets from packet manager out queue and process them ************/
 	EQApplicationPacket *app = nullptr;
-	if (!eqs->CheckState(CLOSING))
+	if (eqs && !eqs->CheckState(CLOSING))
 	{
 		while (app = eqs->PopPacket()) {
 			HandlePacket(app);
@@ -619,8 +623,12 @@ bool Client::Process() {
 
 	ClientToNpcAggroProcess();
 
-	if (client_state != CLIENT_LINKDEAD && (client_state == CLIENT_ERROR || client_state == DISCONNECTED || client_state == CLIENT_KICKED || !eqs->CheckState(ESTABLISHED)))
+	if (eqs && client_state != CLIENT_LINKDEAD && (client_state == CLIENT_ERROR || client_state == DISCONNECTED || client_state == CLIENT_KICKED || !eqs->CheckState(ESTABLISHED)))
 	{
+		if (IsOffline()) {
+			return false;
+		}
+
 		//client logged out or errored out
 		//ResetTrade();
 		if (client_state != CLIENT_KICKED && !bZoning && !instalog) {

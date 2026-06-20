@@ -76,6 +76,29 @@ EQ::ItemInstance::ItemInstance(const ItemData* item, int16 charges) {
 	m_SerialNumber  = GetNextItemInstSerialNumber();
 }
 
+EQ::ItemInstance::ItemInstance(const ItemData *item, const std::string &item_unique_id, int16 charges)
+{
+	if (item) {
+		m_item = new ItemData(*item);
+	}
+
+	m_charges = charges;
+
+	if (m_item && m_item->IsClassCommon()) {
+		m_color = m_item->Color;
+	}
+
+	if (m_item && IsEvolving()) {
+		SetTimer("evolve", RuleI(EvolvingItems, DelayUponEquipping));
+	}
+
+	m_SerialNumber  = GetNextItemInstSerialNumber();
+
+	if (m_item && !item_unique_id.empty()) {
+		SetUniqueID(item_unique_id);
+	}
+}
+
 EQ::ItemInstance::ItemInstance(SharedDatabase *db, uint32 item_id, int16 charges) {
 
 	m_item     = db->GetItem(item_id);
@@ -144,6 +167,14 @@ EQ::ItemInstance::ItemInstance(const ItemInstance& copy)
 	m_SerialNumber = copy.m_SerialNumber;
 	m_custom_data  = copy.m_custom_data;
 	m_timers       = copy.m_timers;
+
+	if (copy.GetUniqueID().empty()) {
+		LogInventoryDetail("Creating unique item ID as part of clone process for item id {}", copy.GetID());
+		CreateUniqueID();
+	}
+	else {
+		m_unique_id = copy.m_unique_id;
+	}
 
 	m_exp       = copy.m_exp;
 	m_evolveLvl = copy.m_evolveLvl;
@@ -908,6 +939,26 @@ EQ::ItemInstance* EQ::ItemInstance::Clone() const
 {
 	// Pseudo-polymorphic copy constructor
 	return new ItemInstance(*this);
+}
+
+bool EQ::ItemInstance::ReplaceItemData(const ItemData *item)
+{
+	if (!item) {
+		return false;
+	}
+
+	auto *new_item = new ItemData(*item);
+
+	safe_delete(m_item);
+	m_item = new_item;
+
+	safe_delete(m_scaledItem);
+	m_scaling = (m_item && m_item->CharmFileID != 0);
+	if (m_scaling) {
+		ScaleItem();
+	}
+
+	return true;
 }
 
 bool EQ::ItemInstance::IsSlotAllowed(int16 slot_id) const {
@@ -2014,4 +2065,12 @@ void EQ::ItemInstance::SetEvolveEquipped(const bool in) const
 	}
 
 	GetTimers().at("evolve").Disable();
+}
+
+std::string EQ::ItemInstance::GenerateUniqueID()
+{
+	std::string unique_hash = UniqueHashGenerator::generate();
+
+	LogInventoryDetail("Generated an item serial number {}", unique_hash);
+	return unique_hash;
 }

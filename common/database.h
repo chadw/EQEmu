@@ -20,12 +20,14 @@
 #include "common/dbcore.h"
 #include "common/eq_packet_structs.h"
 #include "common/eqemu_logsys.h"
+#include "common/linked_list.h"
 #include "common/types.h"
 
-#include <map>
+#include <cmath>
 #include <mutex>
 #include <string>
 #include <vector>
+#include <map>
 
 #define AUTHENTICATION_TIMEOUT    60
 #define INVALID_ID                0xFFFFFFFF
@@ -156,8 +158,8 @@ public:
 	const std::string GetLiveChar(uint32 account_id);
 	bool SetAccountStatus(const std::string& account_name, int16 status);
 	bool SetLocalPassword(uint32 account_id, const std::string& password);
+	AccountStatus::StatusRecord GetAccountStatus(uint32 account_id);
 	bool UpdateLiveChar(const std::string& name, uint32 account_id);
-	int16 GetAccountStatus(uint32 account_id);
 	void SetAccountCRCField(uint32 account_id, const std::string& field_name, uint64 checksum);
 	uint32 CheckLogin(const std::string& name, const std::string& password, const std::string& loginserver, int16* status = 0);
 	uint32 CreateAccount(
@@ -262,6 +264,19 @@ public:
 	void Decode(std::string &in);
 
 	uint64_t GetNextTableId(const std::string& table_name);
+	bool TryReserveItemUniqueId(const std::string &item_unique_id);
+	bool ReserveItemUniqueId(const std::string &item_unique_id);
+	std::string ReserveNewItemUniqueId();
+	bool EnsureItemUniqueId(std::string &item_unique_id);
+	bool PreflightItemUniqueIdMigration(bool verbose = false);
+	bool MigrateItemUniqueIdData(bool clear_trading_state = true, bool verbose = false);
+	bool VerifyItemUniqueIdMigration(bool verbose = false);
+	void ConvertInventoryToNewUniqueId();
+	void ConvertTraderToNewUniqueId();
+	void ConvertParcelsToNewUniqueId();
+	void ConvertInventorySnapshotsToNewUniqueId();
+	void ConvertSharedbankToNewUniqueId();
+	void ClearOfflineTradingState();
 
 private:
 	std::mutex      Mvarcache;

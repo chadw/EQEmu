@@ -21,6 +21,10 @@
 
 #pragma once
 
+#include <array>
+#include <chrono>
+#include <random>
+
 #include "common/bodytypes.h"
 #include "common/deity.h"
 #include "common/eq_constants.h"
@@ -75,6 +79,8 @@ namespace EQ
 		ItemInstance(const ItemData* item = nullptr, int16 charges = 0);
 
 		ItemInstance(SharedDatabase *db, uint32 item_id, int16 charges = 0);
+
+		ItemInstance(const ItemData *item, const std::string &item_unique_id, int16 charges = 0);
 
 		ItemInstance(ItemInstTypes use_type);
 
@@ -160,6 +166,24 @@ namespace EQ
 
 		int16 GetCharges() const				{ return m_charges; }
 		void SetCharges(int16 charges)			{ m_charges = charges; }
+		int16 GetQuantityFromCharges() const
+		{
+			const auto charges = GetCharges();
+			if (charges > 0) {
+				return charges;
+			}
+
+			if (IsStackable()) {
+				return 1;
+			}
+
+			const auto item = GetItem();
+			if (item && item->MaxCharges > 0) {
+				return charges;
+			}
+
+			return 1;
+		}
 
 		uint32 GetPrice() const					{ return m_price; }
 		void SetPrice(uint32 price)				{ m_price = price; }
@@ -198,6 +222,7 @@ namespace EQ
 
 		// Clone current item
 		ItemInstance* Clone() const;
+		bool ReplaceItemData(const ItemData *item);
 
 		bool IsSlotAllowed(int16 slot_id) const;
 
@@ -225,8 +250,11 @@ namespace EQ
 		std::string Serialize(int16 slot_id) const { InternalSerializedItem_Struct s; s.slot_id = slot_id; s.inst = (const void*)this; std::string ser; ser.assign((char*)&s, sizeof(InternalSerializedItem_Struct)); return ser; }
 		void Serialize(OutBuffer& ob, int16 slot_id) const { InternalSerializedItem_Struct isi; isi.slot_id = slot_id; isi.inst = (const void*)this; ob.write((const char*)&isi, sizeof(isi)); }
 
-		inline int32 GetSerialNumber() const { return m_SerialNumber; }
-		inline void SetSerialNumber(int32 id) { m_SerialNumber = id; }
+		int32              GetSerialNumber() const { return m_SerialNumber; }
+		void               SetSerialNumber(int32 id) { m_SerialNumber = id; }
+		const std::string &GetUniqueID() const { return m_unique_id; }
+		void               SetUniqueID(std::string sn) { m_unique_id = std::move(sn); }
+		void               CreateUniqueID() const { m_unique_id = GenerateUniqueID(); }
 
 		std::map<std::string, ::Timer>& GetTimers() const { return m_timers; }
 		void SetTimer(std::string name, uint32 time);
@@ -344,6 +372,7 @@ namespace EQ
 		std::map<uint8, ItemInstance*>::const_iterator _cend() { return m_contents.cend(); }
 
 		void _PutItem(uint8 index, ItemInstance* inst) { m_contents[index] = inst; }
+		static std::string GenerateUniqueID();
 
 		ItemInstTypes    m_use_type{ItemInstNormal};// Usage type for item
 		const ItemData * m_item{nullptr};           // Ptr to item data
@@ -355,6 +384,7 @@ namespace EQ
 		bool             m_attuned{false};
 		int32            m_merchantcount{1};//number avaliable on the merchant, -1=unlimited
 		int32            m_SerialNumber{0}; // Unique identifier for this instance of an item. Needed for Bazaar.
+		mutable std::string m_unique_id{};        // unique serial number across all zones/world TESTING March 2025
 		uint32           m_exp{0};
 		int8             m_evolveLvl{0};
 		ItemData *       m_scaledItem{nullptr};
@@ -371,5 +401,49 @@ namespace EQ
 		std::map<uint8, ItemInstance*>         m_contents {}; // Zero-based index: min=0, max=9
 		std::map<std::string, std::string>     m_custom_data {};
 		mutable std::map<std::string, ::Timer> m_timers {};
+	};
+
+	class UniqueHashGenerator
+	{
+	private:
+		static constexpr char   ALPHANUM[]    = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		static constexpr size_t ALPHANUM_SIZE = sizeof(ALPHANUM) - 1;
+
+		static std::mt19937_64 &GetRng()
+		{
+			thread_local std::mt19937_64 rng = []() {
+				std::random_device rd;
+				std::array<uint32_t, 8> entropy{};
+
+				for (auto &value : entropy) {
+					value = rd();
+				}
+
+				auto now = static_cast<uint64_t>(
+					std::chrono::steady_clock::now().time_since_epoch().count()
+				);
+				entropy[0] ^= static_cast<uint32_t>(now);
+				entropy[1] ^= static_cast<uint32_t>(now >> 32);
+
+				std::seed_seq seed(entropy.begin(), entropy.end());
+				return std::mt19937_64(seed);
+			}();
+
+			return rng;
+		}
+
+	public:
+		static std::string generate()
+		{
+			auto &rng = GetRng();
+			std::uniform_int_distribution<size_t> dist(0, ALPHANUM_SIZE - 1);
+
+			std::array<char, 16> result;
+			for (int i = 0; i < 16; ++i) {
+				result[i] = ALPHANUM[dist(rng)];
+			}
+
+			return std::string(result.begin(), result.end());
+		}
 	};
 }

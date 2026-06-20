@@ -777,6 +777,7 @@ void ZoneServer::HandleMessage(uint16 opcode, const EQ::Net::Packet &p) {
 			if (client) {
 				client->Clearance(wtz->response);
 			}
+			break;
 		}
 		case ServerOP_ZoneToZoneRequest: {
 			// ZoneChange is received by the zone the player is in, then the
@@ -1673,21 +1674,23 @@ void ZoneServer::HandleMessage(uint16 opcode, const EQ::Net::Packet &p) {
 			break;
 		}
 		case ServerOP_BazaarPurchase: {
-			auto in = (BazaarPurchaseMessaging_Struct *)pack->pBuffer;
-			if (in->trader_buy_struct.trader_id <= 0) {
-				LogTrading(
-					"World Message <red>[{}] received with invalid trader_id <red>[{}]",
-					"ServerOP_BazaarPurchase",
-					in->trader_buy_struct.trader_id
-				);
-				return;
+			auto in = reinterpret_cast<BazaarPurchaseMessaging_Struct *>(pack->pBuffer);
+			switch (in->transaction_status) {
+				case BazaarPurchaseBuyerCompleteSendToSeller: {
+					ZSList::Instance()->SendPacket(in->trader_zone_id, in->trader_zone_instance_id, pack);
+					break;
+				}
+				case BazaarPurchaseTraderFailed:
+				case BazaarPurchaseSuccess: {
+					ZSList::Instance()->SendPacket(in->buyer_zone_id, in->buyer_zone_instance_id, pack);
+					break;
+				}
+				default: {
+					LogError(
+						"ServerOP_BazaarPurchase received with no corresponding action for [{}]",
+						in->transaction_status);
+				}
 			}
-
-			auto trader = ClientList::Instance()->FindCLEByCharacterID(in->trader_buy_struct.trader_id);
-			if (trader) {
-				ZSList::Instance()->SendPacket(trader->zone(), trader->instance(), pack);
-			}
-
 			break;
 		}
 		case ServerOP_BuyerMessaging: {
@@ -1723,9 +1726,30 @@ void ZoneServer::HandleMessage(uint16 opcode, const EQ::Net::Packet &p) {
 
 					break;
 				}
-				default:
-					return;
+				default: {
+					break;
+				}
 			}
+			break;
+		}
+		case ServerOP_ReclaimOfflineSessionResp: {
+			if (pack->size != sizeof(OfflineSessionReclaim_Struct)) {
+				break;
+			}
+
+			auto reclaim = reinterpret_cast<OfflineSessionReclaim_Struct *>(pack->pBuffer);
+			auto client  = ClientList::Instance()->FindByAccountID(reclaim->account_id);
+			if (!client) {
+				LogTrading(
+					"Ignoring offline reclaim response [{}] for account [{}]; world client not found",
+					reclaim->request_id,
+					reclaim->account_id
+				);
+				break;
+			}
+
+			client->HandleOfflineSessionReclaimResponse(*reclaim);
+			break;
 		}
 		default: {
 			LogInfo("Unknown ServerOPcode from zone {:#04x}, size [{}]", pack->opcode, pack->size);
