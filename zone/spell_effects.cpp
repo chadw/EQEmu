@@ -7918,6 +7918,11 @@ bool Mob::PassCastRestriction(int value)
 				return true;
 			break;
 
+		case IS_HP_ABOVE_99_PCT:
+			if (GetHPRatio() > 95)
+				return true;
+			break;
+
 		case IS_HP_LESS_THAN_20_PCT:
 			if (GetHPRatio() <= 20)
 				return true;
@@ -9149,10 +9154,10 @@ void Mob::SendCastRestrictionMessage(int requirement_id, bool target_requirement
 		break;
 	case IS_HP_ABOVE_99_PCT:
 		if (target_requirement) {
-			Message(Chat::Red, fmt::format("{} Your target's HP must be at or above 99 pct of its maximum.", msg).c_str());
+			Message(Chat::Red, fmt::format("{} Your target's HP must be at or above 95 pct of its maximum.", msg).c_str());
 		}
 		else {
-			Message(Chat::Red, fmt::format("{} This ability requires you to be at or above 99 pct of your maximum HP.", msg).c_str());
+			Message(Chat::Red, fmt::format("{} This ability requires you to be at or above 95 pct of your maximum HP.", msg).c_str());
 		}
 		break;
 	case IS_MANA_ABOVE_10_PCT:
