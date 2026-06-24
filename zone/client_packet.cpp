@@ -14415,7 +14415,10 @@ void Client::Handle_OP_ShopPlayerBuy(const EQApplicationPacket *app)
 	bool stacked = TryStacking(inst);
 
 	if (!stacked) {
-		freeslotid = m_inv.FindFreeSlot(false, true, item->Size);
+		freeslotid = m_inv.FindFirstFreeSlotThatFitsItemWithStacking(inst);
+		if (freeslotid == EQ::invslot::SLOT_INVALID) {
+			freeslotid = m_inv.FindFreeSlot(false, true, item->Size);
+		}
 	}
 
 	// shouldn't we be reimbursing if these two fail?

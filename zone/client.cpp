@@ -7560,6 +7560,10 @@ void Client::AddAutoXTarget(Mob *m, bool send)
 	if (m->IsCorpse() || m->IsBot() || ((m->IsPet() || m->IsTempPet()) && m->IsPetOwnerClient())) {
 		return;
 	}
+	// if player is charmed, don't add to auto xtar
+	if (m->IsClient() && !m->IsCharmed()) {
+		return;
+	}
 
 	m_activeautohatermgr->increment_count(m);
 

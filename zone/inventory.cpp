@@ -1244,7 +1244,7 @@ bool Client::TryStacking(EQ::ItemInstance* item, uint8 type, bool try_worn, bool
 			continue;
 
 		EQ::ItemInstance* tmp_inst = m_inv.GetItem(i);
-		if(tmp_inst && tmp_inst->GetItem()->ID == item_id && tmp_inst->GetCharges() < tmp_inst->GetItem()->StackSize){
+		if (tmp_inst && tmp_inst->GetItem()->ID == item_id && tmp_inst->GetCharges() < tmp_inst->GetItem()->StackSize) {
 			MoveItemCharges(*item, i, type);
 			CalcBonuses();
 			if (item->GetCharges()) { // we didn't get them all
@@ -1261,7 +1261,18 @@ bool Client::TryStacking(EQ::ItemInstance* item, uint8 type, bool try_worn, bool
 			uint16 slotid = EQ::InventoryProfile::CalcSlotId(i, j);
 			EQ::ItemInstance* tmp_inst = m_inv.GetItem(slotid);
 
-			if(tmp_inst && tmp_inst->GetItem()->ID == item_id && tmp_inst->GetCharges() < tmp_inst->GetItem()->StackSize) {
+			int16 parent_slot = EQ::InventoryProfile::CalcSlotId(slotid);
+			if (parent_slot != EQ::invslot::SLOT_INVALID) {
+				EQ::ItemInstance* parent_inst = m_inv.GetItem(parent_slot);
+				if (parent_inst && parent_inst->GetItem()) {
+					const auto pitem = parent_inst->GetItem();
+					if ((pitem->Tradeskills || pitem->BagType == EQ::item::BagTypeTradeskillBag) && !item->GetItem()->Tradeskills) {
+						continue;
+					}
+				}
+			}
+
+			if (tmp_inst && tmp_inst->GetItem()->ID == item_id && tmp_inst->GetCharges() < tmp_inst->GetItem()->StackSize) {
 				MoveItemCharges(*item, slotid, type);
 				CalcBonuses();
 				if (item->GetCharges()) { // we didn't get them all
@@ -4795,14 +4806,22 @@ bool Client::PutItemInInventoryWithStacking(EQ::ItemInstance *inst)
 
 			auto bag_inst = GetInv().GetItem(base_slot_id + bag_slot);
 			if (!bag_inst && inv_inst->GetItem()->BagSize >= inst->GetItem()->Size) {
+				const auto pitem = inv_inst->GetItem();
+				if ((pitem->Tradeskills || pitem->BagType == EQ::item::BagTypeTradeskillBag) && !inst->GetItem()->Tradeskills) {
+					continue;
+				}
 				empty_bag_slots.push_back(base_slot_id + bag_slot);
 				continue;
 			}
 
 			if (bag_inst && bag_inst->IsStackable() && bag_inst->GetID() == inst->GetID()) {
+				const auto pitem = inv_inst->GetItem();
+				int16 temp_slot = base_slot_id + bag_slot;
+				if ((pitem->Tradeskills || pitem->BagType == EQ::item::BagTypeTradeskillBag) && !inst->GetItem()->Tradeskills) {
+					continue;
+				}
 				auto  stack_size        = bag_inst->GetItem()->StackSize;
 				auto  bag_inst_quantity = bag_inst->GetCharges();
-				int16 temp_slot         = base_slot_id + bag_slot;
 				if (stack_size - bag_inst_quantity >= quantity) {
 					temp tmp = {temp_slot, quantity};
 					queue.push_back(tmp);

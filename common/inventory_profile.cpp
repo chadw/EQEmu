@@ -1833,7 +1833,7 @@ int16 EQ::InventoryProfile::FindFirstFreeSlotThatFitsItem(const EQ::ItemData *it
 
 		if (inv_item->IsClassBag()) {
 			const auto *parent_item = inv_item->GetItem();
-			if (parent_item && !item_data->Tradeskills && parent_item->BagType == EQ::item::BagTypeTradeskillBag) {
+			if (parent_item && !item_data->Tradeskills && (parent_item->Tradeskills || parent_item->BagType == EQ::item::BagTypeTradeskillBag)) {
 				continue;
 			}
 
@@ -2062,7 +2062,14 @@ int16 EQ::InventoryProfile::FindFirstFreeSlotThatFitsItemWithStacking(ItemInstan
 			}
 		}
 
-		if (inv_item->IsClassBag() && CanItemFitInContainer(item_data, inv_item->GetItem())) {
+		if (inv_item->IsClassBag()) {
+			const auto parent_item = inv_item->GetItem();
+			if (parent_item && !item_data->Tradeskills && (parent_item->Tradeskills || parent_item->BagType == EQ::item::BagTypeTradeskillBag)) {
+				continue;
+			}
+			if (!parent_item || !CanItemFitInContainer(item_data, parent_item)) {
+				continue;
+			}
 			int16 const base_slot_id = CalcSlotId(i, invbag::SLOT_BEGIN);
 			uint8 const bag_size     = inv_item->GetItem()->BagSlots;
 			uint8 const item_size    = item_data->Size;

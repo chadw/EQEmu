@@ -144,10 +144,6 @@ random_timer(respawn_timer)
 
 	RandomSpawn(false);
 
-	if (IsFixZEnabled()) {
-		FixZ();
-	}
-
 	// Hardcoded portion for unknown members
 	m_data.unknown024 = 0x7f001194;
 	m_data.unknown076 = 0x0000d5fe;

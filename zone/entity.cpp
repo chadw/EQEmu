@@ -660,8 +660,8 @@ void EntityList::AddCorpse(Corpse *corpse, uint32 in_id)
 		corpse->SetID(in_id);
 
 	corpse->CalcCorpseName();
-	//LogInfo("EntityList::AddCorpse: clearing XTargets for id [{}] name [{}]", corpse->GetID(), corpse->GetName());
-	RemoveFromXTargets(corpse);
+	//LogInfo("EntityList::AddCorpse: clearing Auto XTargets for id [{}] name [{}]", corpse->GetID(), corpse->GetName());
+	RemoveFromAutoXTargets(corpse);
 	corpse_list.emplace(std::pair<uint16, Corpse *>(corpse->GetID(), corpse));
 
 	if (!corpse_timer.Enabled())
