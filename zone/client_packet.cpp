@@ -1000,13 +1000,11 @@ void Client::CompleteConnect()
 	if (IsInAGuild()) {
 		if (ingame) {
 			guild_mgr.UpdateDbMemberOnline(CharacterID(), true);
-			LogInfo("Sending guild members list (ingame) for '{}' guild_id [{}]", GetName(), GuildID());
 			SendGuildMembersList();
 			guild_members_sent = true;
 		}
 
 		if (guild_members_sent == false) {
-			LogInfo("Sending guild members list (fallback) for '{}' guild_id [{}]", GetName(), GuildID());
 			SendGuildMembersList();
 		}
 
@@ -1014,7 +1012,6 @@ void Client::CompleteConnect()
 
 		SendGuildList();
 		if (GetGuildListDirty()) {
-			LogInfo("Sending guild members list (dirty) for '{}' guild_id [{}]", GetName(), GuildID());
 			SendGuildMembersList();
 		}
 
