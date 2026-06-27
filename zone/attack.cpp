@@ -5042,6 +5042,23 @@ void Mob::TryCombatProcs(const EQ::ItemInstance* weapon_g, Mob *on, uint16 hand,
 	// Procs from Buffs and AA both melee and range
 	TrySpellProc(weapon_g, weapon_g->GetItem(), on, hand);
 
+	// Also check tribute slots (personal tributes and guild tributes) for procs.
+	for (int16 s = EQ::invslot::TRIBUTE_BEGIN; s <= EQ::invslot::TRIBUTE_END; ++s) {
+		const EQ::ItemInstance* tinst = GetInv().GetItem(s);
+		if (tinst && tinst->GetItem()) {
+			TryWeaponProc(tinst, tinst->GetItem(), on, hand);
+			TrySpellProc(tinst, tinst->GetItem(), on, hand);
+		}
+	}
+
+	for (int16 s = EQ::invslot::GUILD_TRIBUTE_BEGIN; s <= EQ::invslot::GUILD_TRIBUTE_END; ++s) {
+		const EQ::ItemInstance* tinst = GetInv().GetItem(s);
+		if (tinst && tinst->GetItem()) {
+			TryWeaponProc(tinst, tinst->GetItem(), on, hand);
+			TrySpellProc(tinst, tinst->GetItem(), on, hand);
+		}
+	}
+
 	return;
 }
 
