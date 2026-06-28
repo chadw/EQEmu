@@ -639,8 +639,8 @@ public:
 	int GetDoorsDBCountPlusOne(std::string zone_short_name, int16 version);
 
 	/* Blocked Spells   */
-	int64 GetBlockedSpellsCount(uint32 zone_id);
-	bool LoadBlockedSpells(int64 blocked_spells_count, ZoneSpellsBlocked* into, uint32 zone_id);
+	int64 GetBlockedSpellsCount(uint32 zone_id, int zone_version = -1);
+	bool LoadBlockedSpells(int64 blocked_spells_count, ZoneSpellsBlocked* into, uint32 zone_id, int zone_version = -1);
 
 	/* Traps   */
 	bool	LoadTraps(const std::string& zone_short_name, int16 instance_version);

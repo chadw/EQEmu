@@ -93,6 +93,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 
 extern Zone         *zone;
 extern volatile bool is_zone_loaded;
@@ -685,7 +686,7 @@ bool Mob::DoCastingChecksZoneRestrictions(bool check_on_casting, int32 spell_id)
 			[&]() {
 				if (gm_bypass_message("zone blocked spells")) { return true; }
 				const char* msg = zone->GetSpellBlockedMessage(spell_id, position);
-				Message(Chat::Red, msg ? msg : "You can't cast this spell here.");
+				Message(Chat::Red, (msg && std::strlen(msg) > 0) ? msg : "You can't cast this spell here.");
 				return false;
 			}
 		},
@@ -3909,6 +3910,15 @@ bool Mob::SpellOnTarget(
 	if (!spelltar) {
 		LogSpells("Unable to apply spell [{}] without a target", spell_id);
 		Message(Chat::Red, "SOT: You must have a target for this spell.");
+		return false;
+	}
+
+	// check blocked spells
+	if (zone && zone->IsSpellBlocked(spell_id, glm::vec3(spelltar->GetPosition()))) {
+		const char* msg = zone->GetSpellBlockedMessage(spell_id, glm::vec3(spelltar->GetPosition()));
+		if (spelltar->IsClient()) {
+			spelltar->CastToClient()->Message(Chat::Red, "You can't receive that spell here.");
+		}
 		return false;
 	}
 

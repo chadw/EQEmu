@@ -2410,27 +2410,33 @@ void ZoneDatabase::RefreshGroupFromDB(Client *client){
 	group->SendMarkedNPCsToMember(client);
 }
 
-int64 ZoneDatabase::GetBlockedSpellsCount(uint32 zone_id)
+int64 ZoneDatabase::GetBlockedSpellsCount(uint32 zone_id, int zone_version)
 {
+	const std::string version_filter = (zone_version >= 0) ? fmt::format("AND (zone_version = -1 OR zone_version = {})", zone_version) : "AND zone_version = -1";
+
 	return BlockedSpellsRepository::Count(
 		*this,
 		fmt::format(
-			"zoneid = {} {}",
+			"zoneid = {} {} {}",
 			zone_id,
+			version_filter,
 			ContentFilterCriteria::apply()
 		)
 	);
 }
 
-bool ZoneDatabase::LoadBlockedSpells(int64 blocked_spells_count, ZoneSpellsBlocked* into, uint32 zone_id)
+bool ZoneDatabase::LoadBlockedSpells(int64 blocked_spells_count, ZoneSpellsBlocked* into, uint32 zone_id, int zone_version)
 {
-	LogInfo("Loading Blocked Spells from database for {} ({}).", ZoneStore::Instance()->GetZoneName(zone_id, true), zone_id);
+	LogInfo("Loading Blocked Spells from database for {} ({}) version {}.", ZoneStore::Instance()->GetZoneName(zone_id, true), zone_id, zone_version);
+
+	const std::string version_filter = (zone_version >= 0) ? fmt::format("AND (zone_version = -1 OR zone_version = {})", zone_version) : "AND zone_version = -1";
 
 	const auto& l = BlockedSpellsRepository::GetWhere(
 		*this,
 		fmt::format(
-			"zoneid = {} {} ORDER BY id ASC",
+			"zoneid = {} {} {} ORDER BY id ASC",
 			zone_id,
+			version_filter,
 			ContentFilterCriteria::apply()
 		)
 	);

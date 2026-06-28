@@ -1133,6 +1133,16 @@ void Client::CompleteConnect()
 		GoToBind();
 		return;
 	}
+
+	// remove blocked buffs on zone in
+	if (zone && zone->GetZoneTotalBlockedSpells() > 0) {
+		auto my_buffs = GetBuffSpellIDs();
+		for (const auto &spid : my_buffs) {
+			if (zone->IsSpellBlocked(spid, glm::vec3(GetPosition()))) {
+				BuffFadeBySpellID(spid);
+			}
+		}
+	}
 }
 
 // connecting opcode handlers

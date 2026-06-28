@@ -2248,10 +2248,10 @@ bool Zone::HasGraveyard() {
 void Zone::LoadZoneBlockedSpells()
 {
 	if (!blocked_spells) {
-		zone_total_blocked_spells = content_db.GetBlockedSpellsCount(GetZoneID());
+		zone_total_blocked_spells = content_db.GetBlockedSpellsCount(GetZoneID(), GetInstanceVersion());
 		if (zone_total_blocked_spells > 0) {
 			blocked_spells = new ZoneSpellsBlocked[zone_total_blocked_spells];
-			if (!content_db.LoadBlockedSpells(zone_total_blocked_spells, blocked_spells, GetZoneID())) {
+			if (!content_db.LoadBlockedSpells(zone_total_blocked_spells, blocked_spells, GetZoneID(), GetInstanceVersion())) {
 				LogError(
 					"Failed to load blocked spells for {} ({}).",
 					ZoneStore::Instance()->GetZoneName(GetZoneID(), true),

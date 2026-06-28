@@ -40,6 +40,7 @@ public:
 		uint32_t    spellid;
 		int8_t      type;
 		int32_t     zoneid;
+		int32_t     zone_version;
 		float       x;
 		float       y;
 		float       z;
@@ -66,6 +67,7 @@ public:
 			"spellid",
 			"type",
 			"zoneid",
+			"zone_version",
 			"x",
 			"y",
 			"z",
@@ -88,6 +90,7 @@ public:
 			"spellid",
 			"type",
 			"zoneid",
+			"zone_version",
 			"x",
 			"y",
 			"z",
@@ -144,6 +147,7 @@ public:
 		e.spellid                = 0;
 		e.type                   = 0;
 		e.zoneid                 = 0;
+		e.zone_version           = -1;
 		e.x                      = 0;
 		e.y                      = 0;
 		e.z                      = 0;
@@ -196,18 +200,19 @@ public:
 			e.spellid                = row[1] ? static_cast<uint32_t>(strtoul(row[1], nullptr, 10)) : 0;
 			e.type                   = row[2] ? static_cast<int8_t>(atoi(row[2])) : 0;
 			e.zoneid                 = row[3] ? static_cast<int32_t>(atoi(row[3])) : 0;
-			e.x                      = row[4] ? strtof(row[4], nullptr) : 0;
-			e.y                      = row[5] ? strtof(row[5], nullptr) : 0;
-			e.z                      = row[6] ? strtof(row[6], nullptr) : 0;
-			e.x_diff                 = row[7] ? strtof(row[7], nullptr) : 0;
-			e.y_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
-			e.z_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
-			e.message                = row[10] ? row[10] : "";
-			e.description            = row[11] ? row[11] : "";
-			e.min_expansion          = row[12] ? static_cast<int8_t>(atoi(row[12])) : -1;
-			e.max_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
-			e.content_flags          = row[14] ? row[14] : "";
-			e.content_flags_disabled = row[15] ? row[15] : "";
+			e.zone_version           = row[4] ? static_cast<int32_t>(atoi(row[4])) : -1;
+			e.x                      = row[5] ? strtof(row[5], nullptr) : 0;
+			e.y                      = row[6] ? strtof(row[6], nullptr) : 0;
+			e.z                      = row[7] ? strtof(row[7], nullptr) : 0;
+			e.x_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
+			e.y_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
+			e.z_diff                 = row[10] ? strtof(row[10], nullptr) : 0;
+			e.message                = row[11] ? row[11] : "";
+			e.description            = row[12] ? row[12] : "";
+			e.min_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
+			e.max_expansion          = row[14] ? static_cast<int8_t>(atoi(row[14])) : -1;
+			e.content_flags          = row[15] ? row[15] : "";
+			e.content_flags_disabled = row[16] ? row[16] : "";
 
 			return e;
 		}
@@ -244,18 +249,19 @@ public:
 		v.push_back(columns[1] + " = " + std::to_string(e.spellid));
 		v.push_back(columns[2] + " = " + std::to_string(e.type));
 		v.push_back(columns[3] + " = " + std::to_string(e.zoneid));
-		v.push_back(columns[4] + " = " + std::to_string(e.x));
-		v.push_back(columns[5] + " = " + std::to_string(e.y));
-		v.push_back(columns[6] + " = " + std::to_string(e.z));
-		v.push_back(columns[7] + " = " + std::to_string(e.x_diff));
-		v.push_back(columns[8] + " = " + std::to_string(e.y_diff));
-		v.push_back(columns[9] + " = " + std::to_string(e.z_diff));
-		v.push_back(columns[10] + " = '" + Strings::Escape(e.message) + "'");
-		v.push_back(columns[11] + " = '" + Strings::Escape(e.description) + "'");
-		v.push_back(columns[12] + " = " + std::to_string(e.min_expansion));
-		v.push_back(columns[13] + " = " + std::to_string(e.max_expansion));
-		v.push_back(columns[14] + " = '" + Strings::Escape(e.content_flags) + "'");
-		v.push_back(columns[15] + " = '" + Strings::Escape(e.content_flags_disabled) + "'");
+		v.push_back(columns[4] + " = " + std::to_string(e.zone_version));
+		v.push_back(columns[5] + " = " + std::to_string(e.x));
+		v.push_back(columns[6] + " = " + std::to_string(e.y));
+		v.push_back(columns[7] + " = " + std::to_string(e.z));
+		v.push_back(columns[8] + " = " + std::to_string(e.x_diff));
+		v.push_back(columns[9] + " = " + std::to_string(e.y_diff));
+		v.push_back(columns[10] + " = " + std::to_string(e.z_diff));
+		v.push_back(columns[11] + " = '" + Strings::Escape(e.message) + "'");
+		v.push_back(columns[12] + " = '" + Strings::Escape(e.description) + "'");
+		v.push_back(columns[13] + " = " + std::to_string(e.min_expansion));
+		v.push_back(columns[14] + " = " + std::to_string(e.max_expansion));
+		v.push_back(columns[15] + " = '" + Strings::Escape(e.content_flags) + "'");
+		v.push_back(columns[16] + " = '" + Strings::Escape(e.content_flags_disabled) + "'");
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -281,6 +287,7 @@ public:
 		v.push_back(std::to_string(e.spellid));
 		v.push_back(std::to_string(e.type));
 		v.push_back(std::to_string(e.zoneid));
+		v.push_back(std::to_string(e.zone_version));
 		v.push_back(std::to_string(e.x));
 		v.push_back(std::to_string(e.y));
 		v.push_back(std::to_string(e.z));
@@ -326,6 +333,7 @@ public:
 			v.push_back(std::to_string(e.spellid));
 			v.push_back(std::to_string(e.type));
 			v.push_back(std::to_string(e.zoneid));
+			v.push_back(std::to_string(e.zone_version));
 			v.push_back(std::to_string(e.x));
 			v.push_back(std::to_string(e.y));
 			v.push_back(std::to_string(e.z));
@@ -375,18 +383,19 @@ public:
 			e.spellid                = row[1] ? static_cast<uint32_t>(strtoul(row[1], nullptr, 10)) : 0;
 			e.type                   = row[2] ? static_cast<int8_t>(atoi(row[2])) : 0;
 			e.zoneid                 = row[3] ? static_cast<int32_t>(atoi(row[3])) : 0;
-			e.x                      = row[4] ? strtof(row[4], nullptr) : 0;
-			e.y                      = row[5] ? strtof(row[5], nullptr) : 0;
-			e.z                      = row[6] ? strtof(row[6], nullptr) : 0;
-			e.x_diff                 = row[7] ? strtof(row[7], nullptr) : 0;
-			e.y_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
-			e.z_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
-			e.message                = row[10] ? row[10] : "";
-			e.description            = row[11] ? row[11] : "";
-			e.min_expansion          = row[12] ? static_cast<int8_t>(atoi(row[12])) : -1;
-			e.max_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
-			e.content_flags          = row[14] ? row[14] : "";
-			e.content_flags_disabled = row[15] ? row[15] : "";
+			e.zone_version           = row[4] ? static_cast<int32_t>(atoi(row[4])) : -1;
+			e.x                      = row[5] ? strtof(row[5], nullptr) : 0;
+			e.y                      = row[6] ? strtof(row[6], nullptr) : 0;
+			e.z                      = row[7] ? strtof(row[7], nullptr) : 0;
+			e.x_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
+			e.y_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
+			e.z_diff                 = row[10] ? strtof(row[10], nullptr) : 0;
+			e.message                = row[11] ? row[11] : "";
+			e.description            = row[12] ? row[12] : "";
+			e.min_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
+			e.max_expansion          = row[14] ? static_cast<int8_t>(atoi(row[14])) : -1;
+			e.content_flags          = row[15] ? row[15] : "";
+			e.content_flags_disabled = row[16] ? row[16] : "";
 
 			all_entries.push_back(e);
 		}
@@ -415,18 +424,19 @@ public:
 			e.spellid                = row[1] ? static_cast<uint32_t>(strtoul(row[1], nullptr, 10)) : 0;
 			e.type                   = row[2] ? static_cast<int8_t>(atoi(row[2])) : 0;
 			e.zoneid                 = row[3] ? static_cast<int32_t>(atoi(row[3])) : 0;
-			e.x                      = row[4] ? strtof(row[4], nullptr) : 0;
-			e.y                      = row[5] ? strtof(row[5], nullptr) : 0;
-			e.z                      = row[6] ? strtof(row[6], nullptr) : 0;
-			e.x_diff                 = row[7] ? strtof(row[7], nullptr) : 0;
-			e.y_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
-			e.z_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
-			e.message                = row[10] ? row[10] : "";
-			e.description            = row[11] ? row[11] : "";
-			e.min_expansion          = row[12] ? static_cast<int8_t>(atoi(row[12])) : -1;
-			e.max_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
-			e.content_flags          = row[14] ? row[14] : "";
-			e.content_flags_disabled = row[15] ? row[15] : "";
+			e.zone_version           = row[4] ? static_cast<int32_t>(atoi(row[4])) : -1;
+			e.x                      = row[5] ? strtof(row[5], nullptr) : 0;
+			e.y                      = row[6] ? strtof(row[6], nullptr) : 0;
+			e.z                      = row[7] ? strtof(row[7], nullptr) : 0;
+			e.x_diff                 = row[8] ? strtof(row[8], nullptr) : 0;
+			e.y_diff                 = row[9] ? strtof(row[9], nullptr) : 0;
+			e.z_diff                 = row[10] ? strtof(row[10], nullptr) : 0;
+			e.message                = row[11] ? row[11] : "";
+			e.description            = row[12] ? row[12] : "";
+			e.min_expansion          = row[13] ? static_cast<int8_t>(atoi(row[13])) : -1;
+			e.max_expansion          = row[14] ? static_cast<int8_t>(atoi(row[14])) : -1;
+			e.content_flags          = row[15] ? row[15] : "";
+			e.content_flags_disabled = row[16] ? row[16] : "";
 
 			all_entries.push_back(e);
 		}
@@ -505,6 +515,7 @@ public:
 		v.push_back(std::to_string(e.spellid));
 		v.push_back(std::to_string(e.type));
 		v.push_back(std::to_string(e.zoneid));
+		v.push_back(std::to_string(e.zone_version));
 		v.push_back(std::to_string(e.x));
 		v.push_back(std::to_string(e.y));
 		v.push_back(std::to_string(e.z));
@@ -543,6 +554,7 @@ public:
 			v.push_back(std::to_string(e.spellid));
 			v.push_back(std::to_string(e.type));
 			v.push_back(std::to_string(e.zoneid));
+			v.push_back(std::to_string(e.zone_version));
 			v.push_back(std::to_string(e.x));
 			v.push_back(std::to_string(e.y));
 			v.push_back(std::to_string(e.z));
