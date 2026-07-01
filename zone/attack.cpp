@@ -4583,15 +4583,19 @@ void Mob::CommonDamage(Mob* attacker, int64 &damage, const uint16 spell_id, cons
 				if (FromDamageShield && damage > 0) {
 					//special crap for spell damage, looks hackish to me
 					// %1 was hit by non-melee for %2 points of damage.
-					owner->MessageString(
-						Chat::NonMelee,
-						fmt::format(
-							"{} was hit by non-melee for {} points of damage. ({})",
-							GetCleanName(),
-							damage,
-							spells[spell_id].name
-						).c_str(),
-					);
+					if (owner->IsClient()) {
+						owner->CastToClient()->FilteredMessage(
+							this,
+							Chat::NonMelee,
+							FilterSpellDamage,
+							fmt::format(
+								"{} was hit by non-melee for {} points of damage. ({})",
+								GetCleanName(),
+								damage,
+								spells[spell_id].name
+							).c_str()
+						);
+					}
 				}
 				else {
 					if (damage > 0) {
@@ -4634,26 +4638,30 @@ void Mob::CommonDamage(Mob* attacker, int64 &damage, const uint16 spell_id, cons
 							Mob* owner = attacker->GetOwner();
 
 							if (owner && owner->CastToClient()->GetFilter(FilterDamageShields) != FilterHide) {
-								owner->MessageString(
+								owner->CastToClient()->FilteredMessage(
+									this,
 									Chat::DamageShield,
+									FilterDamageShields,
 									fmt::format(
 										"{} was hit by non-melee for {} points of damage. ({})",
 										GetCleanName(),
 										damage,
 										spells[spell_id].name
-									).c_str(),
+									).c_str()
 								);
 							}
 						} else {
 							if (attacker->CastToClient()->GetFilter(FilterDamageShields) != FilterHide) {
-								attacker->MessageString(
+								attacker->CastToClient()->FilteredMessage(
+									attacker,
 									Chat::DamageShield,
+									FilterDamageShields,
 									fmt::format(
 										"{} was hit by non-melee for {} points of damage. ({})",
 										GetCleanName(),
 										damage,
 										spells[spell_id].name
-									).c_str(),
+									).c_str()
 								);
 							}
 						}
