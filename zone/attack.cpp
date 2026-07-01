@@ -2517,13 +2517,15 @@ bool NPC::Death(Mob* killer_mob, int64 damage, uint16 spell, EQ::skills::SkillTy
 	if (killer_mob && killer_mob->IsOfClientBot() && IsValidSpell(spell) && damage > 0) {
 		char val1[20] = { 0 };
 
-		entity_list.FilteredMessageClose(
-			this,
-			false,
-			RuleI(Range, SpellMessages),
-			Chat::NonMelee,
-			FilterSpellDamage,
-			fmt::format("{} hit {} for {} points of non-melee damage. ({})", killer_mob->GetCleanName(), GetCleanName(), damage, spells[spell].name).c_str()
+		entity_list.MessageCloseString(
+			this, /* Sender */
+			false, /* Skip Sender */
+			RuleI(Range, DamageMessages),
+			Chat::NonMelee, /* 283 */
+			HIT_NON_MELEE, /* %1 hit %2 for %3 points of non-melee damage. */
+			killer_mob->GetCleanName(), /* Message1 */
+			GetCleanName(), /* Message2 */
+			ConvertArray(damage, val1) /* Message3 */
 		);
 	}
 
@@ -4107,7 +4109,7 @@ void Mob::CommonDamage(Mob* attacker, int64 &damage, const uint16 spell_id, cons
 
 				healed = RuleB(Spells, CompoundLifetapHeals) ? attacker->GetActSpellHealing(spell_id, healed) : healed;
 				LogCombat("Applying lifetap heal of [{}] to [{}]", healed, attacker->GetName());
-				attacker->HealDamage(healed, attacker, spell_id);
+				attacker->HealDamage(healed);
 
 				//we used to do a message to the client, but its gone now.
 				// emote goes with every one ... even npcs
@@ -4637,13 +4639,17 @@ void Mob::CommonDamage(Mob* attacker, int64 &damage, const uint16 spell_id, cons
 						}
 					}
 					else {
-						entity_list.FilteredMessageClose(
-							attacker,
-							false,
+						entity_list.FilteredMessageCloseString(
+							attacker, /* Sender */
+							false, /* Sender is attacker, so do not skip */
 							RuleI(Range, SpellMessages),
-							Chat::NonMelee,
-							FilterSpellDamage,
-							fmt::format("{} hit {} for {} points of non-melee damage. ({})", attacker->GetCleanName(), GetCleanName(), damage, spells[spell_id].name).c_str()
+							Chat::NonMelee, /* 283 */
+							FilterSpellDamage, /* FilterType: 13 */
+							HIT_NON_MELEE, /* %1 hit %2 for %3 points of non-melee damage. */
+							0,
+							attacker->GetCleanName(), /* Message1 */
+							GetCleanName(), /* Message2 */
+							ConvertArray(damage, val1) /* Message3 */
 						);
 					}
 				}
@@ -4789,7 +4795,7 @@ void Mob::CommonDamage(Mob* attacker, int64 &damage, const uint16 spell_id, cons
 	}
 }
 
-void Mob::HealDamage(uint64 amount, Mob* caster, uint16 spell_id, const char* caster_name_fallback)
+void Mob::HealDamage(uint64 amount, Mob* caster, uint16 spell_id)
 {
 #ifdef LUA_EQEMU
 	uint64 lua_ret = 0;
@@ -4810,34 +4816,54 @@ void Mob::HealDamage(uint64 amount, Mob* caster, uint16 spell_id, const char* ca
 		acthealed = amount;
 
 	if (acthealed > RuleI(Spells, HealAmountMessageFilterThreshold)) {
-		uint16 eff_spell_id = spell_id;
-		if (eff_spell_id == SPELL_UNKNOWN && caster)
-			eff_spell_id = caster->CastingSpellID();
-
 		if (caster) {
-			eqFilterType filter = IsBuffSpell(spell_id) ? FilterHealOverTime : FilterSpellDamage;
-			auto caster_name = (filter == FilterPetSpells)
-				? fmt::format("{} (Owner: {})", caster->GetCleanName(), caster->GetOwner()->GetCleanName())
-				: caster->GetCleanName();
+			if (IsBuffSpell(spell_id)) { // hots
+				// message to caster
+				if ((caster->IsClient() && caster == this)) {
+					if (caster->CastToClient()->ClientVersionBit() & EQ::versions::maskSoFAndLater) {
+						FilteredMessageString(caster, Chat::NonMelee, FilterHealOverTime,
+							HOT_HEAL_SELF, itoa(acthealed), spells[spell_id].name);
+					}
+					else
+						FilteredMessageString(caster, Chat::NonMelee, FilterHealOverTime,
+							YOU_HEALED, GetCleanName(), itoa(acthealed));
+				}
+				else if ((caster->IsClient() && caster != this)) {
+					if (caster->CastToClient()->ClientVersionBit() & EQ::versions::maskSoFAndLater)
+						caster->FilteredMessageString(caster, Chat::NonMelee, FilterHealOverTime,
+							HOT_HEAL_OTHER, GetCleanName(), itoa(acthealed),
+							spells[spell_id].name);
+					else
+						caster->FilteredMessageString(caster, Chat::NonMelee, FilterHealOverTime,
+							YOU_HEAL, GetCleanName(), itoa(acthealed));
+				}
 
-			std::string target_name = (caster == this)
-				? (GetGender() == 0 ? "himself" : (GetGender() == 1 ? "herself" : "itself"))
-				: GetCleanName();
+				// message to target
+				if (IsClient() && caster != this) {
+					if (CastToClient()->ClientVersionBit() & EQ::versions::maskSoFAndLater)
+						FilteredMessageString(caster, Chat::NonMelee, FilterHealOverTime,
+							HOT_HEALED_OTHER, caster->GetCleanName(),
+							itoa(acthealed), spells[spell_id].name);
+					else
+						FilteredMessageString(this, Chat::NonMelee, FilterHealOverTime,
+							YOU_HEALED, caster->GetCleanName(), itoa(acthealed));
+				}
+			}
+			else { // normal heals
+				// Message to caster
+				if (caster->IsClient()) {
+					caster->FilteredMessageString(caster, Chat::NonMelee,
+						FilterSpellDamage, YOU_HEAL, GetCleanName(),
+						itoa(acthealed));
+					}
 
-			entity_list.FilteredMessageClose(
-				this,
-				false,
-				RuleI(Range, SpellMessages),
-				Chat::NonMelee,
-				filter,
-				fmt::format("{} has healed {} for {} points of damage. ({})",
-					caster_name,
-					target_name,
-					acthealed,
-					spells[eff_spell_id].name
-				).c_str()
-			);
-
+				// Message to target
+				if (IsClient() && caster != this) {
+					FilteredMessageString(caster, Chat::NonMelee,
+					FilterSpellDamage, YOU_HEALED, caster->GetCleanName(),
+					itoa(acthealed));
+				}
+			}
 		} else if (
 			CastToClient()->GetFilter(FilterHealOverTime) != FilterShowSelfOnly ||
 			CastToClient()->GetFilter(FilterHealOverTime) != FilterHide
