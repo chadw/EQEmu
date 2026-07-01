@@ -1742,6 +1742,7 @@ void NPC::PickPocket(Client* thief)
 			thief->PutItemInInventory(slot_id, *item_inst);
 			thief->SendItemPacket(slot_id, item_inst, ItemPacketTrade);
 		}
+		thief->CheckItemDiscoverability(item_inst->GetID());
 		RemoveItem(item_inst->GetID());
 		thief->SendPickPocketResponse(this, 0, PickPocketItem, item_inst->GetItem());
 		safe_delete(item_inst);

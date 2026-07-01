@@ -4700,30 +4700,11 @@ void Client::SummonItemIntoInventory(
 		return;
 	}
 
-	// Try stacking first if the item is stackable, then fall back to finding a free slot
-	if (!PutItemInInventoryWithStacking(inst)) {
-		// PutItemInInventoryWithStacking failed, fall back to original behavior
-		const bool  is_arrow = inst->GetItem()->ItemType == EQ::item::ItemTypeArrow;
-		const int16 slot_id  = m_inv.FindFreeSlot(
-			inst->IsClassBag(),
-			true,
-			inst->GetItem()->Size,
-			is_arrow
-		);
-
-		SummonItem(
-			item_id,
-			charges,
-			aug1,
-			aug2,
-			aug3,
-			aug4,
-			aug5,
-			aug6,
-			is_attuned,
-			slot_id
-		);
+	if (!AutoPutLootInInventory(*inst, false, true)) {
+		PutLootInInventory(EQ::invslot::slotCursor, *inst);
 	}
+
+	CheckItemDiscoverability(item_id);
 
 	safe_delete(inst);
 }
