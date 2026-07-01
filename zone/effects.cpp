@@ -501,9 +501,13 @@ int64 Mob::GetActSpellHealing(uint16 spell_id, int64 value, Mob* target, bool fr
 		}
 
 		if (critical_modifier > 1) {
-			entity_list.MessageCloseString(
-				this, true, 100, Chat::SpellCrit,
-				OTHER_CRIT_HEAL, GetName(), itoa(value));
+			std::string _msg;
+			if (IsValidSpell(spell_id) && spells[spell_id].name[0]) {
+				_msg = fmt::format("{} performs an exceptional heal! ({}) ({})", GetName(), itoa(value), spells[spell_id].name);
+			} else {
+				_msg = fmt::format("{} performs an exceptional heal! ({})", GetName(), itoa(value));
+			}
+			entity_list.MessageClose(this, true, 100, Chat::SpellCrit, "%s", _msg.c_str());
 
 			if (IsClient()) {
 				MessageString(Chat::SpellCrit, YOU_CRIT_HEAL, itoa(value));
