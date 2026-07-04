@@ -280,6 +280,12 @@ inline std::string GetMobAttributeByString(Mob *mob, const std::string &attribut
 		if (attribute == "see_invis_undead") {
 			return std::to_string(npc->SeeInvisibleUndead());
 		}
+		if (attribute == "see_hide") {
+			return std::to_string(npc->SeeHide());
+		}
+		if (attribute == "see_improved_hide") {
+			return std::to_string(npc->SeeImprovedHide());
+		}
 		if (attribute == "faction") {
 			return std::to_string(npc->GetNPCFactionID());
 		}
@@ -427,6 +433,25 @@ inline std::string GetMobAttributeByString(Mob *mob, const std::string &attribut
 			}
 
 			return Strings::Commify(std::to_string(npc->GetHeroicStrikethrough())) + scaling_modified;
+		}
+
+		if (attribute == "spell_shield") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShield()));
+		}
+		if (attribute == "spell_shield_fire") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShieldFire()));
+		}
+		if (attribute == "spell_shield_cold") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShieldCold()));
+		}
+		if (attribute == "spell_shield_poison") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShieldPoison()));
+		}
+		if (attribute == "spell_shield_disease") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShieldDisease()));
+		}
+		if (attribute == "spell_shield_magic") {
+			return Strings::Commify(std::to_string(npc->GetInnateSpellShieldMagic()));
 		}
 
 		npc->GetNPCEmote(npc->GetEmoteID(), 0);
@@ -760,6 +785,12 @@ void Mob::DisplayInfo(Mob *mob)
 				"heal_scale",
 				"avoidance",
 				"heroic_strikethrough",
+				"spell_shield",
+				"spell_shield_fire",
+				"spell_shield_cold",
+				"spell_shield_poison",
+				"spell_shield_disease",
+				"spell_shield_magic",
 			};
 
 			window_text += WriteDisplayInfoSection(mob, "NPC Stats", npc_stats, 1, true);
@@ -777,6 +808,8 @@ void Mob::DisplayInfo(Mob *mob)
 				"emote",
 				"see_invis",
 				"see_invis_undead",
+				"see_hide",
+				"see_improved_hide",
 				"faction",
 				"loottable",
 				"prim_skill",
