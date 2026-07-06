@@ -624,12 +624,7 @@ void Object::RandomSpawn(bool send_packet) {
 
 bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 {
-	if (m_ground_spawn) {//This is a Cool Groundspawn
-		respawn_timer.Start();
-	}
-
 	if (m_type == ObjectTypes::Temporary) {
-		bool cursor_delete  = false;
 		bool duplicate_lore = false;
 
 		if (m_inst && sender) {
@@ -642,8 +637,19 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 				const int16 lore_item_slot = sender->GetInv().HasItem(item->ID, 0, invWhereBank);
 				if (lore_item_slot != INVALID_INDEX) { // if the duplicate is in the bank, delete it.
 					sender->DeleteItemInInventory(lore_item_slot);
-				} else { // otherwise, we delete the new one
-					cursor_delete = true;
+				} else {
+					sender->Message(Chat::Yellow, "Duplicate lore item detected");
+
+					auto outapp = new EQApplicationPacket(OP_ClickObject, sizeof(ClickObject_Struct));
+					memcpy(outapp->pBuffer, click_object, sizeof(ClickObject_Struct));
+					auto co = (ClickObject_Struct*) outapp->pBuffer;
+					co->drop_id = 0;
+					entity_list.QueueClients(nullptr, outapp, false);
+					safe_delete(outapp);
+
+					sender->SetTradeskillObject(nullptr);
+					user = nullptr;
+					return true;
 				}
 			}
 
@@ -727,10 +733,6 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 
 			sender->CheckItemDiscoverability(m_inst->GetID());
 
-			if (cursor_delete) {    // delete the item if it's a duplicate lore. We have to do this because the client expects the item packet
-				sender->DeleteItemInInventory(EQ::invslot::slotCursor, 1, true);
-			}
-
 			if (!m_ground_spawn) {
 				safe_delete(m_inst);
 			}
@@ -739,6 +741,10 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 			sender->SetTradeskillObject(nullptr);
 
 			user = nullptr;
+		}
+
+		if (m_ground_spawn) {
+			respawn_timer.Start();
 		}
 
 		// Send click to all clients (removes entity on client)
