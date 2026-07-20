@@ -3453,7 +3453,7 @@ namespace Titanium
 		ob << '|' << itoa(item->FactionAmt3);
 		ob << '|' << itoa(item->FactionAmt4);
 
-		ob << '|' << item->CharmFile;
+		ob << '|' << item->GetClientCharmFile(RuleB(Items, DisplayDiscoveredBy));
 
 		ob << '|' << itoa(item->AugType);
 

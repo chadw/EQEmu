@@ -6156,9 +6156,15 @@ namespace RoF2
 
 	DECODE(OP_Trader)
 	{
+		if (__packet->size < sizeof(uint32)) {
+			LogWarning("(RoF2) Short OP_Trader size [{}]", __packet->size);
+			__packet->SetOpcode(OP_Unknown);
+			return;
+		}
+
 		auto action = *(uint32 *)__packet->pBuffer;
 
-		LogTrading(
+		LogTradingDetail(
 			"(RoF2) DECODE(OP_Trader) action [{}] size [{}]",
 			action,
 			__packet->size
@@ -6214,6 +6220,10 @@ namespace RoF2
 				LogTrading("(RoF2) ListTraderItems action <green>[{}]", action);
 				break;
 			}
+			case structs::RoF2BazaarTraderBuyerActions::ReconcileItems: {
+				LogTradingDetail("(RoF2) ReconcileItems action <green>[{}] size [{}]", action, __packet->size);
+				break;
+			}
 			case structs::RoF2BazaarTraderBuyerActions::PriceUpdate: {
 				DECODE_LENGTH_EXACT(structs::TraderPriceUpdate_Struct);
 				SETUP_DIRECT_DECODE(TraderPriceUpdate_Struct, structs::TraderPriceUpdate_Struct);
@@ -6260,9 +6270,15 @@ namespace RoF2
 
 	DECODE(OP_TraderShop)
 	{
+		if (__packet->size < sizeof(uint32)) {
+			LogWarning("(RoF2) Short OP_TraderShop size [{}]", __packet->size);
+			__packet->SetOpcode(OP_Unknown);
+			return;
+		}
+
 		uint32 action = *(uint32 *)__packet->pBuffer;
 
-		LogTrading(
+		LogTradingDetail(
 			"(RoF2) DECODE(OP_TraderShop) action [{}] size [{}]",
 			action,
 			__packet->size
@@ -6296,6 +6312,19 @@ namespace RoF2
 				IN_str(item_name);
 
 				FINISH_DIRECT_DECODE();
+				break;
+			}
+			case structs::RoF2BazaarTraderBuyerActions::EndTransaction: {
+				auto eq_buffer = __packet->pBuffer;
+				__packet->size = sizeof(TraderClick_Struct);
+				__packet->pBuffer = new unsigned char[__packet->size] {};
+
+				auto emu = (TraderClick_Struct *) __packet->pBuffer;
+				emu->Code = EndTransaction;
+
+				safe_delete_array(eq_buffer);
+
+				LogTradingDetail("(RoF2) EndTransaction action <green>[{}]", action);
 				break;
 			}
 			case structs::RoF2BazaarTraderBuyerActions::ClickTrader: {
@@ -6696,8 +6725,9 @@ namespace RoF2
 		ob.write((const char*)&ibs, sizeof(RoF2::structs::ItemBodyStruct));
 
 		//charm text
-		if (strlen(item->CharmFile) > 0)
-			ob.write((const char*)item->CharmFile, strlen(item->CharmFile));
+		const auto charm_file = item->GetClientCharmFile(RuleB(Items, DisplayDiscoveredBy));
+		if (!charm_file.empty())
+			ob.write(charm_file.data(), charm_file.size());
 		ob.write("\0", 1);
 
 		RoF2::structs::ItemSecondaryBodyStruct isbs;

@@ -5385,8 +5385,9 @@ namespace RoF
 		ob.write((const char*)&ibs, sizeof(RoF::structs::ItemBodyStruct));
 
 		//charm text
-		if (strlen(item->CharmFile) > 0)
-			ob.write((const char*)item->CharmFile, strlen(item->CharmFile));
+		const auto charm_file = item->GetClientCharmFile(RuleB(Items, DisplayDiscoveredBy));
+		if (!charm_file.empty())
+			ob.write(charm_file.data(), charm_file.size());
 		ob.write("\0", 1);
 
 		RoF::structs::ItemSecondaryBodyStruct isbs;

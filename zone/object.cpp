@@ -626,6 +626,7 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 {
 	if (m_type == ObjectTypes::Temporary) {
 		bool duplicate_lore = false;
+		bool placement_success = false;
 
 		if (m_inst && sender) {
 			// if there is a lore conflict, delete the offending item from the server inventory
@@ -727,11 +728,18 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 				}
 			}
 
-			// Transfer item to client
-			sender->PutItemInInventory(EQ::invslot::slotCursor, *m_inst, false);
-			sender->SendItemPacket(EQ::invslot::slotCursor, m_inst, ItemPacketTrade);
+			if (m_ground_spawn && m_inst) {
+				m_inst->SetUniqueID("");
+			}
 
-			sender->CheckItemDiscoverability(m_inst->GetID());
+			placement_success = sender->PutItemInInventoryWithStacking(m_inst);
+			if (!placement_success) {
+				// Fallback to putting on cursor and letting the client move it.
+				sender->PutItemInInventory(EQ::invslot::slotCursor, *m_inst, false);
+				sender->SendItemPacket(EQ::invslot::slotCursor, m_inst, ItemPacketTrade);
+			}
+
+			sender->CheckItemDiscoverability(m_inst ? m_inst->GetID() : 0);
 
 			if (!m_ground_spawn) {
 				safe_delete(m_inst);
@@ -756,8 +764,9 @@ bool Object::HandleClick(Client* sender, const ClickObject_Struct* click_object)
 
 		safe_delete(outapp);
 
-		// Remove object
-		content_db.DeleteObject(m_id);
+		if (placement_success || !m_ground_spawn) {
+			content_db.DeleteObject(m_id);
+		}
 
 		if (!m_ground_spawn) {
 			entity_list.RemoveEntity(GetID());

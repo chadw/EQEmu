@@ -15658,9 +15658,20 @@ void Client::Handle_OP_Trader(const EQApplicationPacket *app)
 	//
 	// SoF sends 1 or more unhandled OP_Trader packets of size 96 when a trade has completed.
 	// I don't know what they are for (yet), but it doesn't seem to matter that we ignore them.
+	if (app->size < sizeof(uint32)) {
+		LogWarning(
+			"Short OP_Trader packet for client [{}] account [{}] character [{}] size [{}]",
+			GetCleanName(),
+			AccountID(),
+			CharacterID(),
+			app->size
+		);
+		return;
+	}
+
 	auto action = *(uint32 *)app->pBuffer;
 
-	LogTrading(
+	LogTradingDetail(
 		"Handle_OP_Trader client [{}] account [{}] character [{}] action [{}] size [{}] trader [{}] buyer [{}] zone [{}] instance [{}]",
 		GetCleanName(),
 		AccountID(),
@@ -15708,6 +15719,10 @@ void Client::Handle_OP_Trader(const EQApplicationPacket *app)
 		case ListTraderItems: {
 			TraderShowItems();
 			LogTrading("Show Trader Items");
+			break;
+		}
+		case ReconcileItems: {
+			LogTradingDetail("Reconcile Trader Items");
 			break;
 		}
 		default: {
@@ -15913,7 +15928,7 @@ void Client::Handle_OP_TradeRequestAck(const EQApplicationPacket *app)
 void Client::Handle_OP_TraderShop(const EQApplicationPacket *app)
 {
 	auto in = (TraderClick_Struct *) app->pBuffer;
-	LogTrading(
+	LogTradingDetail(
 		"Handle_OP_TraderShop client [{}] account [{}] character [{}] code [{}] trader_id [{}] unknown008 [{}] approval [{}] size [{}] trader [{}] buyer [{}] zone [{}] instance [{}]",
 		GetCleanName(),
 		AccountID(),
@@ -15928,7 +15943,7 @@ void Client::Handle_OP_TraderShop(const EQApplicationPacket *app)
 		GetZoneID(),
 		GetInstanceID()
 	);
-	LogTrading("Handle_OP_TraderShop: TraderClick_Struct TraderID [{}], Code [{}], Unknown008 [{}], Approval [{}]",
+	LogTradingDetail("Handle_OP_TraderShop: TraderClick_Struct TraderID [{}], Code [{}], Unknown008 [{}], Approval [{}]",
 			   in->TraderID,
 			   in->Code,
 			   in->Unknown008,
@@ -15937,7 +15952,7 @@ void Client::Handle_OP_TraderShop(const EQApplicationPacket *app)
 
 	switch (in->Code) {
 		case ClickTrader: {
-			LogTrading("Handle_OP_TraderShop case ClickTrader [{}]", in->Code);
+			LogTradingDetail("Handle_OP_TraderShop case ClickTrader [{}]", in->Code);
 			auto outapp        = std::make_unique<EQApplicationPacket>(
 				OP_TraderShop,
 				static_cast<uint32>(sizeof(TraderClick_Struct))
@@ -15947,14 +15962,14 @@ void Client::Handle_OP_TraderShop(const EQApplicationPacket *app)
 
 			if (trader) {
 				data->Approval = trader->WithCustomer(GetID());
-				LogTrading("Client::Handle_OP_TraderShop: Shop Request ([{}]) to ([{}]) with Approval: [{}]",
+				LogTradingDetail("Client::Handle_OP_TraderShop: Shop Request ([{}]) to ([{}]) with Approval: [{}]",
 						   GetCleanName(),
 						   trader->GetCleanName(),
 						   data->Approval
 				);
 			}
 			else {
-				LogTrading("Client::Handle_OP_TraderShop: entity_list.GetClientByID(tcs->traderid)"
+				LogTradingDetail("Client::Handle_OP_TraderShop: entity_list.GetClientByID(tcs->traderid)"
 						   " returned a nullptr pointer"
 				);
 				auto outapp = new EQApplicationPacket(OP_ShopEndConfirm);
@@ -15990,7 +16005,7 @@ void Client::Handle_OP_TraderShop(const EQApplicationPacket *app)
 			SetTraderID(0);
 			if (c) {
 				c->WithCustomer(0);
-				LogTrading("End Transaction - Code [{}]", in->Code);
+				LogTradingDetail("End Transaction - Code [{}]", in->Code);
 			}
 			else {
 				LogTrading("Null Client Pointer for Trader - Code [{}]", in->Code);

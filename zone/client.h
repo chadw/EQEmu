@@ -928,6 +928,7 @@ public:
 	void SendPath(Mob* target);
 
 	bool IsDiscovered(uint32 itemid);
+	std::string GetDiscoverer(uint32 itemid);
 	void DiscoverItem(uint32 itemid);
 
 	bool TGB() const { return tgb; }

@@ -547,6 +547,7 @@ RULE_INT(Spells, PointBlankAOEMaxTargets, 0, "Max number of targets a Point-Blan
 RULE_INT(Spells, DefaultAOEMaxTargets, 0, "Max number of targets that an AOE spell which does not meet other descriptions can cast on. Set to 0 for no limit.")
 RULE_BOOL(Spells, AllowFocusOnSkillDamageSpells, false, "Allow focus effects 185, 459, and 482 to enhance SkillAttack spell effect 193")
 RULE_STRING(Spells, AlwaysStackSpells, "", "Comma-Seperated list of spell IDs to always stack with every other spell, except themselves.")
+RULE_STRING(Spells, DoppelgangerBuffBacklist, "", "Comma-seperated list of spells to never transfer to Doppelganger")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(Combat)
@@ -1167,6 +1168,7 @@ RULE_BOOL(Items, AugmentItemAllowInvisibleAugments, false, "Enable this to allow
 RULE_BOOL(Items, AlwaysReturnHandins, true, "Enable this to always return handins to the player")
 RULE_BOOL(Items, NPCUseRecommendedLevels, false, "Enable to have NPCs scale item stats by recommended levels")
 RULE_STRING(Items, IllusionStorageWhitelistItemIDs, "", "This is a comma delimited list of item ids that are allowed to be stored in the illusion storage in addition to regular illusion items.")
+RULE_BOOL(Items, DisplayDiscoveredBy, false, "Display the first discoverer's character name in item information using the client charm text field")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(Parcel)

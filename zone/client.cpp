@@ -2701,7 +2701,28 @@ void Client::ReadBook(BookRequest_Struct* book)
 		return;
 	}
 
-	auto b = content_db.GetBook(text_file);
+	const bool has_discovery_tag = book->type == BookType::ItemInfo && text_file.back() == '#';
+	const auto item_id = has_discovery_tag ?
+		Strings::ToUnsignedInt(text_file.substr(0, text_file.size() - 1)) :
+		0;
+	const auto* item = item_id ? database.GetItem(item_id) : nullptr;
+	Book_Struct b{};
+	if (!item) {
+		b = content_db.GetBook(text_file);
+	} else if (item->CharmFile[0] != '\0') {
+		b = content_db.GetBook(item->CharmFile);
+	}
+
+	if (book->type == BookType::ItemInfo && RuleB(Items, DisplayDiscoveredBy) && item_id) {
+		const auto discoverer = GetDiscoverer(item_id);
+		if (!discoverer.empty()) {
+			if (!b.text.empty()) {
+				b.text += "<br>";
+			}
+
+			b.text += fmt::format("Discovered By: {}<br>", discoverer);
+		}
+	}
 
 	if (!b.text.empty()) {
 		auto outapp = new EQApplicationPacket(OP_ReadBook, b.text.size() + sizeof(BookText_Struct));
@@ -4997,6 +5018,11 @@ bool Client::IsDiscovered(uint32 item_id)
 	return true;
 }
 
+std::string Client::GetDiscoverer(uint32 item_id)
+{
+	return DiscoveredItemsRepository::FindOne(database, item_id).char_name;
+}
+
 void Client::DiscoverItem(uint32 item_id) {
 	auto e = DiscoveredItemsRepository::NewEntity();
 
@@ -7289,7 +7315,90 @@ void Client::Doppelganger(uint16 spell_id, Mob *target, const char *name_overrid
 		//we allocated a new NPC type object, give the NPC ownership of that memory
 		swarm_pet_npc->GiveNPCTypeData(npc_type_copy);
 
+		// Give Client's Buffs to the pet
+		std::vector<std::string> buff_blacklist = Strings::Split(RuleS(Custom, DoppelgangerBuffBacklist), ",");
+		for (int buff_idx = 0; buff_idx < GetMaxTotalSlots(); buff_idx++)
+		{
+			if (!IsValidSpell(buffs[buff_idx].spellid))
+			{
+				continue;
+			}
+
+			bool blacklisted = false;
+			for (const auto &blacklisted_spell : buff_blacklist)
+			{
+				if (Strings::ToInt(blacklisted_spell) == buffs[buff_idx].spellid)
+				{
+					blacklisted = true;
+					break;
+				}
+			}
+
+			if (blacklisted)
+			{
+				continue;
+			}
+
+			swarm_pet_npc->ApplySpellBuff(buffs[buff_idx].spellid, buffs[buff_idx].ticsremaining);
+		}
+
+		// Matches order that NPCs equip items in
+		std::vector<int> custom_order = {
+			EQ::invslot::slotPrimary,
+			EQ::invslot::slotSecondary,
+			EQ::invslot::slotRange,
+			EQ::invslot::slotCharm,
+			EQ::invslot::slotEar1,
+			EQ::invslot::slotHead,
+			EQ::invslot::slotFace,
+			EQ::invslot::slotEar2,
+			EQ::invslot::slotNeck,
+			EQ::invslot::slotShoulders,
+			EQ::invslot::slotArms,
+			EQ::invslot::slotBack,
+			EQ::invslot::slotWrist1,
+			EQ::invslot::slotWrist2,
+			EQ::invslot::slotHands,
+			EQ::invslot::slotFinger1,
+			EQ::invslot::slotFinger2,
+			EQ::invslot::slotChest,
+			EQ::invslot::slotLegs,
+			EQ::invslot::slotFeet,
+			EQ::invslot::slotWaist
+		};
+
+		for (int slot_id : custom_order) {
+			auto item_inst = GetInv().GetItem(slot_id);
+			if (item_inst) {
+				auto aug0 = item_inst->GetAugment(0);
+				auto aug1 = item_inst->GetAugment(1);
+				auto aug2 = item_inst->GetAugment(2);
+				auto aug3 = item_inst->GetAugment(3);
+				auto aug4 = item_inst->GetAugment(4);
+				auto aug5 = item_inst->GetAugment(5);
+
+				swarm_pet_npc->AddItemFixed(
+					item_inst->GetID(), 1,	true,
+					aug0 != nullptr ? aug0->GetID() : 0,
+					aug1 != nullptr ? aug1->GetID() : 0,
+					aug2 != nullptr ? aug2->GetID() : 0,
+					aug3 != nullptr ? aug3->GetID() : 0,
+					aug4 != nullptr ? aug4->GetID() : 0,
+					aug5 != nullptr ? aug5->GetID() : 0
+				);
+			}
+		}
+
+		// Create the NPC
 		entity_list.AddNPC(swarm_pet_npc);
+
+		swarm_pet_npc->CalcBonuses();
+
+		swarm_pet_npc->SetHP(swarm_pet_npc->GetMaxHP());
+		swarm_pet_npc->SetMana(swarm_pet_npc->GetMaxMana());
+
+		//LogInfo("My HP: [{}]/[{}] My Mana: [{}]/[{}]", swarm_pet_npc->GetHP(), swarm_pet_npc->GetMaxHP(), swarm_pet_npc->GetMana(), swarm_pet_npc->GetMaxMana());
+
 		summon_count--;
 	}
 

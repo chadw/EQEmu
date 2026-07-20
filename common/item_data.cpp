@@ -260,6 +260,15 @@ bool EQ::ItemData::IsQuestItem() const {
 	return QuestItemFlag;
 }
 
+std::string EQ::ItemData::GetClientCharmFile(bool include_discovery_tag) const
+{
+	if (!include_discovery_tag) {
+		return CharmFile;
+	}
+
+	return std::to_string(ID) + "#";
+}
+
 bool EQ::ItemData::CheckLoreConflict(const ItemData* l_item, const ItemData* r_item)
 {
 	if (!l_item || !r_item)
