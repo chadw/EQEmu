@@ -1096,9 +1096,27 @@ void ClientTaskState::RewardTask(Client *c, const TaskInformation *ti, ClientTas
 
 	if (ti->reward_points > 0) {
 		if (ti->reward_point_type == static_cast<int32_t>(zone->GetCurrencyID(RADIANT_CRYSTAL))) {
-			c->AddRadiantCrystals(ti->reward_points);
+			uint32 currency_id = zone->GetCurrencyID(RADIANT_CRYSTAL);
+			if (currency_id != 0) {
+				c->AddAlternateCurrencyValue(currency_id, ti->reward_points);
+				const EQ::ItemData *item = database.GetItem(RuleI(Zone, RadiantCrystalItemID));
+				if (item) {
+					c->Message(Chat::Yellow, fmt::format("You have received ({}) {}!", ti->reward_points, item->Name).c_str());
+				}
+			} else {
+				c->AddRadiantCrystals(ti->reward_points);
+			}
 		} else if (ti->reward_point_type == static_cast<int32_t>(zone->GetCurrencyID(EBON_CRYSTAL))) {
-			c->AddEbonCrystals(ti->reward_points);
+			uint32 currency_id = zone->GetCurrencyID(EBON_CRYSTAL);
+			if (currency_id != 0) {
+				c->AddAlternateCurrencyValue(currency_id, ti->reward_points);
+				const EQ::ItemData *item = database.GetItem(RuleI(Zone, EbonCrystalItemID));
+				if (item) {
+					c->Message(Chat::Yellow, fmt::format("You have received ({}) {}!", ti->reward_points, item->Name).c_str());
+				}
+			} else {
+				c->AddEbonCrystals(ti->reward_points);
+			}
 		} else {
 			for (const auto& ac : zone->AlternateCurrencies) {
 				if (ti->reward_point_type == ac.id) {
