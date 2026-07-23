@@ -1596,6 +1596,10 @@ bool Mob::Attack(Mob* other, int Hand, bool bRiposte, bool IsStrikethrough, bool
 		return false; // Rogean: How can you attack while feigned? Moved up from Aggro Code.
 	}
 
+	if (RuleB(Spells, DoppelgangerRetargetOnOwnerAttack) && IsClient() && GetTempPetCount()) {
+		entity_list.AddTempPetsToHateList(this, other, false);
+	}
+
 	const EQ::ItemInstance* weapon = nullptr;
 
 

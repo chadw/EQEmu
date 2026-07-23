@@ -5612,12 +5612,6 @@ void Mob::SetTarget(Mob *mob)
 			r->SendRaidAssistTarget();
 		}
 	}
-
-	if (IsClient() && mob) {
-		if (GetTempPetCount()) {
-			entity_list.AddTempPetsToHateList(this, mob, false);
-		}
-	}
 }
 
 // For when we want a Ground Z at a location we are not at yet

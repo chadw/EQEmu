@@ -7984,6 +7984,10 @@ void Client::ProcessXTargetAutoHaters()
 			auto *mob = entity_list.GetMob(e.spawn_id);
 			if (!mob || mob->IsCorpse())
 				continue;
+
+			if (!(mob->CheckAggro(this) || mob->IsOnFeignMemory(this)))
+				continue;
+
 			if (!IsXTarget(mob)) {
 				auto slot = empty_slots.front();
 				empty_slots.pop();

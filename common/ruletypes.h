@@ -548,6 +548,7 @@ RULE_INT(Spells, DefaultAOEMaxTargets, 0, "Max number of targets that an AOE spe
 RULE_BOOL(Spells, AllowFocusOnSkillDamageSpells, false, "Allow focus effects 185, 459, and 482 to enhance SkillAttack spell effect 193")
 RULE_STRING(Spells, AlwaysStackSpells, "", "Comma-Seperated list of spell IDs to always stack with every other spell, except themselves.")
 RULE_STRING(Spells, DoppelgangerBuffBacklist, "", "Comma-seperated list of spells to never transfer to Doppelganger")
+RULE_BOOL(Spells, DoppelgangerRetargetOnOwnerAttack, true, "Enable doppelganger retarget when owner attacks")
 RULE_CATEGORY_END()
 
 RULE_CATEGORY(Combat)
