@@ -7980,12 +7980,21 @@ void Client::ProcessXTargetAutoHaters()
 	// there are new NPCs for our empty slots on the manager, but ahhh fuck it.
 	if (!empty_slots.empty() && !GetXTargetAutoMgr()->empty() && XTargetAutoAddHaters) {
 		auto &haters = GetXTargetAutoMgr()->get_list();
+		XTargetAutoHaters *active_mgr = GetXTargetAutoMgr();
+		bool personal_mgr = (active_mgr == &m_autohatermgr);
 		for (auto &e : haters) {
 			auto *mob = entity_list.GetMob(e.spawn_id);
 			if (!mob || mob->IsCorpse())
 				continue;
 
-			if (!(mob->CheckAggro(this) || mob->IsOnFeignMemory(this)))
+			bool allow = false;
+			if (personal_mgr) {
+				allow = (mob->CheckAggro(this) || mob->IsOnFeignMemory(this));
+			} else {
+				allow = (mob->IsEngaged() || mob->CheckAggro(this) || mob->IsOnFeignMemory(this));
+			}
+
+			if (!allow)
 				continue;
 
 			if (!IsXTarget(mob)) {
