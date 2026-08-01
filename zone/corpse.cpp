@@ -1742,7 +1742,12 @@ void Corpse::LootCorpseItem(Client *c, const EQApplicationPacket *app)
 
 		linker.GenerateLink();
 
-		c->MessageString(Chat::Loot, LOOTED_MESSAGE, linker.Link().c_str());
+		std::string link_and_count = linker.Link();
+		if (count > 1) {
+			link_and_count += fmt::format(" (x{})", count);
+		}
+
+		c->MessageString(Chat::Loot, LOOTED_MESSAGE, link_and_count.c_str());
 
 		if (!IsPlayerCorpse()) {
 			Group *g = c->GetGroup();
@@ -1751,7 +1756,7 @@ void Corpse::LootCorpseItem(Client *c, const EQApplicationPacket *app)
 					c, Chat::Loot,
 					OTHER_LOOTED_MESSAGE,
 					c->GetName(),
-					linker.Link().c_str()
+					link_and_count.c_str()
 				);
 			}
 			else {
@@ -1762,7 +1767,7 @@ void Corpse::LootCorpseItem(Client *c, const EQApplicationPacket *app)
 						Chat::Loot,
 						OTHER_LOOTED_MESSAGE,
 						c->GetName(),
-						linker.Link().c_str()
+						link_and_count.c_str()
 					);
 				}
 			}
