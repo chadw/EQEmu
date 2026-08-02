@@ -225,6 +225,7 @@ NPC::NPC(const NPCType *npc_type_data, Spawn2 *in_respawn, const glm::vec4 &posi
 	SetInnateSpellShieldPoison(npc_type_data->spell_shield_poison);
 	SetInnateSpellShieldDisease(npc_type_data->spell_shield_disease);
 	SetInnateSpellShieldMagic(npc_type_data->spell_shield_magic);
+	innate_summon_timer_override = npc_type_data->summon_timer_override;
 
 	// used for when switch back to charm
 	default_ac               = npc_type_data->AC;

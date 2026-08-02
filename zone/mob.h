@@ -234,6 +234,7 @@ public:
 	int32_t innate_spell_shield_poison = 0;
 	int32_t innate_spell_shield_disease = 0;
 	int32_t innate_spell_shield_magic = 0;
+	int32_t innate_summon_timer_override = 0;
 
 	// Bot attack flag
 	Timer bot_attack_flag_timer;

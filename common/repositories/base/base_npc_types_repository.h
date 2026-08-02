@@ -173,6 +173,7 @@ public:
 		int32_t     spell_shield_poison;
 		int32_t     spell_shield_disease;
 		int32_t     spell_shield_magic;
+		uint8_t     summon_timer_override;
 	};
 
 	static std::string PrimaryKey()
@@ -320,6 +321,7 @@ public:
 			"spell_shield_poison",
 			"spell_shield_disease",
 			"spell_shield_magic",
+			"summon_timer_override",
 		};
 	}
 
@@ -463,6 +465,7 @@ public:
 			"spell_shield_poison",
 			"spell_shield_disease",
 			"spell_shield_magic",
+			"summon_timer_override",
 		};
 	}
 
@@ -640,6 +643,7 @@ public:
 		e.spell_shield_poison    = 0;
 		e.spell_shield_disease   = 0;
 		e.spell_shield_magic     = 0;
+		e.summon_timer_override  = 0;
 
 		return e;
 	}
@@ -813,6 +817,7 @@ public:
 			e.spell_shield_poison    = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
 			e.spell_shield_disease   = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
 			e.spell_shield_magic     = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
+			e.summon_timer_override  = row[137] ? static_cast<uint8_t>(strtoul(row[137], nullptr, 10)) : 0;
 
 			return e;
 		}
@@ -982,6 +987,7 @@ public:
 		v.push_back(columns[134] + " = " + std::to_string(e.spell_shield_poison));
 		v.push_back(columns[135] + " = " + std::to_string(e.spell_shield_disease));
 		v.push_back(columns[136] + " = " + std::to_string(e.spell_shield_magic));
+		v.push_back(columns[137] + " = " + std::to_string(e.summon_timer_override));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1140,6 +1146,7 @@ public:
 		v.push_back(std::to_string(e.spell_shield_poison));
 		v.push_back(std::to_string(e.spell_shield_disease));
 		v.push_back(std::to_string(e.spell_shield_magic));
+		v.push_back(std::to_string(e.summon_timer_override));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -1306,6 +1313,7 @@ public:
 			v.push_back(std::to_string(e.spell_shield_poison));
 			v.push_back(std::to_string(e.spell_shield_disease));
 			v.push_back(std::to_string(e.spell_shield_magic));
+			v.push_back(std::to_string(e.summon_timer_override));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}
@@ -1476,6 +1484,7 @@ public:
 			e.spell_shield_poison 	 = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
 			e.spell_shield_disease 	 = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
 			e.spell_shield_magic 	 = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
+			e.summon_timer_override  = row[137] ? static_cast<uint8_t>(strtoul(row[137], nullptr, 10)) : 0;
 
 			all_entries.push_back(e);
 		}
@@ -1637,6 +1646,7 @@ public:
 			e.spell_shield_poison 	 = row[134] ? static_cast<int32_t>(atoi(row[134])) : 0;
 			e.spell_shield_disease 	 = row[135] ? static_cast<int32_t>(atoi(row[135])) : 0;
 			e.spell_shield_magic 	 = row[136] ? static_cast<int32_t>(atoi(row[136])) : 0;
+			e.summon_timer_override  = row[137] ? static_cast<uint8_t>(strtoul(row[137], nullptr, 10)) : 0;
 
 			all_entries.push_back(e);
 		}
@@ -1848,6 +1858,7 @@ public:
 		v.push_back(std::to_string(e.spell_shield_poison));
 		v.push_back(std::to_string(e.spell_shield_disease));
 		v.push_back(std::to_string(e.spell_shield_magic));
+		v.push_back(std::to_string(e.summon_timer_override));
 
 		auto results = db.QueryDatabase(
 			fmt::format(
@@ -2007,6 +2018,7 @@ public:
 			v.push_back(std::to_string(e.spell_shield_poison));
 			v.push_back(std::to_string(e.spell_shield_disease));
 			v.push_back(std::to_string(e.spell_shield_magic));
+			v.push_back(std::to_string(e.summon_timer_override));
 
 			insert_chunks.push_back("(" + Strings::Implode(",", v) + ")");
 		}

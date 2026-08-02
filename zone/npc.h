@@ -275,6 +275,7 @@ public:
 	inline bool	IsMerchantOpen() { return merchant_open; }
 	inline uint8 GetGreedPercent() { return NPCTypedata->greed; }
 	inline bool GetParcelMerchant() { return NPCTypedata->is_parcel_merchant; }
+	inline bool GetSummonTimerOverride() const { return NPCTypedata->summon_timer_override; }
 	void	Depop(bool start_spawn_timer = false);
 	void	Stun(int duration);
 	void	UnStun();
