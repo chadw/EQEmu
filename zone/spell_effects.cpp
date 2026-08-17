@@ -91,8 +91,11 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 		int durat = CalcBuffDuration(caster, this, spell_id, caster_level);
 		if(durat) // negatives are perma buffs
 		{
+			if (caster && durat > 0) {
+				durat = caster->GetActSpellDuration(spell_id, durat);
+			}
 			buffslot = AddBuff(caster, spell_id, durat, caster_level);
-			if(buffslot == -1)	// stacking failure
+			if(buffslot == -1) 	// stacking failure
 				return false;
 		}
 		else
