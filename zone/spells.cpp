@@ -5117,15 +5117,19 @@ bool Mob::IsImmuneToSpell(uint16 spell_id, Mob *caster)
 	// slow and haste spells
 	if(GetSpecialAbility(SpecialAbility::SlowImmunity) && IsEffectInSpell(spell_id, SpellEffect::AttackSpeed))
 	{
-		LogSpells("We are immune to Slow spells");
-		caster->MessageString(Chat::Red, IMMUNE_ATKSPEED);
-		int32 aggro = caster->CheckAggroAmount(spell_id, this);
-		if(aggro > 0) {
-			AddToHateList(caster, aggro);
+		if (IsBeneficialSpell(spell_id)) {
+			// allow beneficial spells
 		} else {
-			AddToHateList(caster, 1,0,true,false,false,spell_id);
+			LogSpells("We are immune to Slow spells");
+			caster->MessageString(Chat::Red, IMMUNE_ATKSPEED);
+			int32 aggro = caster->CheckAggroAmount(spell_id, this);
+			if(aggro > 0) {
+				AddToHateList(caster, aggro);
+			} else {
+				AddToHateList(caster, 1,0,true,false,false,spell_id);
+			}
+			return true;
 		}
-		return true;
 	}
 
 	// client vs client fear
@@ -5221,15 +5225,19 @@ bool Mob::IsImmuneToSpell(uint16 spell_id, Mob *caster)
 	)
 	{
 		if(GetSpecialAbility(SpecialAbility::SnareImmunity)) {
-			LogSpells("We are immune to Snare spells");
-			caster->MessageString(Chat::Red, IMMUNE_MOVEMENT);
-			int32 aggro = caster->CheckAggroAmount(spell_id, this);
-			if(aggro > 0) {
-				AddToHateList(caster, aggro);
+			if (IsBeneficialSpell(spell_id)) {
+				// allow beneficial spells
 			} else {
-				AddToHateList(caster, 1,0,true,false,false,spell_id);
+				LogSpells("We are immune to Snare spells");
+				caster->MessageString(Chat::Red, IMMUNE_MOVEMENT);
+				int32 aggro = caster->CheckAggroAmount(spell_id, this);
+				if(aggro > 0) {
+					AddToHateList(caster, aggro);
+				} else {
+					AddToHateList(caster, 1,0,true,false,false,spell_id);
+				}
+				return true;
 			}
-			return true;
 		}
 	}
 
