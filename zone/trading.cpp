@@ -559,7 +559,12 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 						int        item_count = 0;
 						for (int16 bslot      = EQ::invbag::SLOT_BEGIN; bslot < item->BagSlots; bslot++) {
 							const EQ::ItemInstance *baginst = inst->GetItem(bslot);
-							if (baginst && baginst->GetItem() && with->CanPetTakeItem(baginst)) {
+
+							if (!baginst || !baginst->GetItem()) {
+								continue;
+							}
+
+							if (with->CanPetTakeItem(baginst)) {
 								// add item to pet's inventory
 								auto lde = LootdropEntriesRepository::NewNpcEntity();
 								lde.equip_item   = 1;
