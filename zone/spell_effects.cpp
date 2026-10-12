@@ -824,6 +824,13 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 
 				SetPetType(PetType::Charmed);
 
+				// Make charmed pet parser friendly
+				if (caster) {
+					char pet_name[64];
+					snprintf(pet_name, sizeof(pet_name), "%s`s Charmed Pet", caster->GetCleanName());
+					TempName(pet_name);
+				}
+
 				// This was done in AddBuff, but we were not a pet yet, so
 				// the target windows didn't get updated.
 				EQApplicationPacket *outapp = MakeBuffsPacket();
@@ -4476,6 +4483,9 @@ void Mob::BuffFadeBySlot(int slot, bool iRecalcBonuses)
 				{
 					owner->SetPet(0);
 				}
+
+				// revert to original name
+				TempName();
 
 				// Any client that has a previous charmed pet targetted shouldo
 				// no longer see the buffs on the old pet.
