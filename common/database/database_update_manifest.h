@@ -1689,7 +1689,7 @@ CREATE TABLE `command_settings` (
 	UNIQUE KEY `UK_command_settings_1` (`command`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `command_settings` VALUES ('acceptrules', '90', ''),('advnpcspawn', '150', 'advnpc'),('aggro', '80', ''),('aggrozone', '200', ''),('ai', '100', ''),('appearance', '150', ''),('apply_shared_memory', '250', ''),('attack', '150', ''),('augmentitem', '250', 'aug'),('ban', '200', ''),('beard', '80', ''),('beardcolor', '80', ''),('bestz', '80', ''),('bind', '80', ''),('camerashake', '80', ''),('castspell', '90', 'cast'),('chat', '200', ''),('checklos', '50', 'los'),('clearinvsnapshots', '200', ''),('connectworldserver', '200', 'connectworld'),('corpse', '90', ''),('crashtest', '201', ''),('cvs', '80', ''),('damage', '150', ''),('date', '150', ''),('dbspawn2', '100', ''),('delacct', '200', ''),('deletegraveyard', '200', ''),('delpetition', '80', ''),('depop', '100', ''),('depopzone', '100', ''),('details', '80', ''),('disablerecipe', '80', ''),('disarmtrap', '80', ''),('distance', '80', ''),('doanim', '50', ''),('emote', '150', ''),('emotesearch', '80', ''),('emoteview', '80', ''),('enablerecipe', '80', ''),('equipitem', '50', ''),('face', '80', ''),('findnpctype', '90', 'fn'),('findspell', '90', 'fs|spfind'),('findzone', '1', 'fz'),('fixmob', '150', ''),('flag', '201', ''),('flagedit', '150', ''),('flags', '80', ''),('flymode', '80', ''),('fov', '80', ''),('freeze', '100', ''),('gassign', '150', ''),('gender', '90', ''),('getplayerburiedcorpsecount', '100', ''),('getvariable', '200', ''),('ginfo', '20', ''),('giveitem', '150', 'gi'),('givemoney', '150', ''),('globalview', '80', ''),('gm', '80', ''),('gmspeed', '80', ''),('goto', '80', ''),('grid', '150', ''),('guild', '80', 'guilds'),('guildapprove', '0', ''),('guildcreate', '0', ''),('guildlist', '0', ''),('hair', '80', ''),('haircolor', '80', ''),('haste', '100', ''),('hatelist', '80', ''),('heal', '100', ''),('helm', '80', ''),('help', '0', ''),('heritage', '80', ''),('heromodel', '200', 'hm'),('hideme', '80', 'gmhideme'),('hotfix', '250', ''),('hp', '90', ''),('incstat', '200', ''),('instance', '80', ''),('interrogateinv', '0', ''),('interrupt', '50', ''),('invsnapshot', '80', ''),('invul', '80', 'invulnerable'),('ipban', '201', ''),('iplookup', '200', ''),('iteminfo', '10', ''),('itemsearch', '90', 'fi|finditem|search'),('kick', '80', ''),('kill', '80', ''),('lastname', '80', ''),('level', '150', ''),('listnpcs', '90', ''),('listpetition', '80', ''),('load_shared_memory', '250', ''),('loc', '0', ''),('lock', '200', ''),('logs', '250', ''),('logtest', '250', ''),('makepet', '150', ''),('mana', '100', ''),('maxskills', '90', ''),('memspell', '100', ''),('merchant_close_shop', '100', 'close_shop'),('merchant_open_shop', '100', 'open_shop'),('modifynpcstat', '150', ''),('motd', '200', ''),('movechar', '80', ''),('myskills', '0', ''),('mysqltest', '250', ''),('mysql', '255', ''),('mystats', '50', ''),('name', '100', ''),('netstats', '200', ''),('npccast', '90', ''),('npcedit', '150', ''),('npcemote', '80', ''),('npcloot', '150', ''),('npcsay', '80', ''),('npcshout', '90', ''),('npcspawn', '100', ''),('npcspecialattk', '150', 'npcspecialatk|npcspecialattack'),('npcstats', '90', ''),('npctype_cache', '250', ''),('npctypespawn', '90', 'dbspawn'),('nukebuffs', '100', ''),('nukeitem', '150', ''),('object', '100', ''),('oocmute', '200', ''),('opcode', '250', ''),('path', '200', ''),('peekinv', '80', ''),('peqzone', '2', ''),('permaclass', '150', ''),('permagender', '150', ''),('permarace', '150', ''),('petitioninfo', '20', ''),('pf', '0', ''),('picklock', '0', ''),('pvp', '80', ''),('qglobal', '150', ''),('questerrors', '0', ''),('race', '90', ''),('raidloot', '0', ''),('randomfeatures', '90', ''),('refreshgroup', '0', ''),('reloadaa', '200', ''),('reloadallrules', '80', ''),('reloademote', '80', ''),('reloadlevelmods', '255', ''),('reloadperlexportsettings', '255', ''),('reloadqst', '80', 'reloadquest|rq'),('reloadrulesworld', '80', ''),('reloadstatic', '150', ''),('reloadtitles', '150', ''),('reloadworld', '255', ''),('reloadzps', '150', 'reloadzonepoints'),('repop', '90', ''),('repopclose', '100', ''),('resetaa', '100', ''),('resetaa_timer', '200', ''),('revoke', '80', ''),('rules', '200', ''),('save', '80', ''),('scribespell', '90', ''),('scribespells', '100', ''),('sendzonespawns', '200', ''),('sensetrap', '0', ''),('serverinfo', '201', ''),('serverrules', '90', ''),('setaapts', '100', 'setaapoints'),('setaaxp', '100', 'setaaexp'),('setadventurepoints', '200', ''),('setanim', '200', ''),('setcrystals', '100', ''),('setfaction', '170', ''),('setgraveyard', '200', ''),('setlanguage', '50', ''),('setlsinfo', '0', ''),('setpass', '150', ''),('setpvppoints', '100', ''),('setskill', '90', ''),('setskillall', '100', 'setallskill|setallskills'),('setstartzone', '80', ''),('setstat', '255', ''),('setxp', '100', 'setexp'),('showbonusstats', '50', ''),('showbuffs', '80', ''),('shownumhits', '0', ''),('showskills', '50', ''),('showspellslist', '100', ''),('showstats', '80', ''),('shutdown', '200', ''),('size', '90', ''),('spawn', '150', ''),('spawnfix', '80', ''),('spawnstatus', '150', ''),('spellinfo', '10', ''),('spoff', '0', ''),('spon', '0', ''),('stun', '100', ''),('summon', '80', ''),('summonburiedplayercorpse', '100', ''),('summonitem', '150', 'si'),('suspend', '100', ''),('task', '150', ''),('tattoo', '80', ''),('tempname', '100', ''),('texture', '150', ''),('time', '90', ''),('timers', '200', ''),('timezone', '90', ''),('title', '100', ''),('titlesuffix', '50', ''),('traindisc', '100', ''),('tune', '100', ''),('undyeme', '0', ''),('unfreeze', '100', ''),('unlock', '150', ''),('unscribespell', '90', ''),('unscribespells', '100', ''),('untraindisc', '180', ''),('untraindiscs', '180', ''),('uptime', '10', ''),('version', '0', ''),('viewnpctype', '100', ''),('viewpetition', '80', ''),('wc', '200', ''),('weather', '90', ''),('worldshutdown', '200', ''),('wp', '150', ''),('wpadd', '150', ''),('wpinfo', '150', ''),('xtargets', '250', ''),('zclip', '150', ''),('zcolor', '150', ''),('zheader', '150', ''),('zone', '80', ''),('zonebootup', '100', ''),('zoneinstance', '80', ''),('zonelock', '200', ''),('zoneshutdown', '200', ''),('zonespawn', '250', ''),('zonestatus', '150', ''),('zopp', '250', ''),('zsafecoords', '150', ''),('zsave', '200', ''),	('zsky', '150', ''),('zstats', '80', ''),('zunderworld', '80', ''),('zuwcoords', '80', '');
+INSERT INTO `command_settings` VALUES ('acceptrules', '90', ''),('advnpcspawn', '150', 'advnpc'),('aggro', '80', ''),('aggrozone', '200', ''),('ai', '100', ''),('appearance', '150', ''),('apply_shared_memory', '250', ''),('attack', '150', ''),('augmentitem', '250', 'aug'),('ban', '200', ''),('beard', '80', ''),('beardcolor', '80', ''),('bestz', '80', ''),('bind', '80', ''),('camerashake', '80', ''),('castspell', '90', 'cast'),('chat', '200', ''),('checklos', '50', 'los'),('clearinvsnapshots', '200', ''),('connectworldserver', '200', 'connectworld'),('corpse', '90', ''),('crashtest', '201', ''),('cvs', '80', ''),('damage', '150', ''),('date', '150', ''),('dbspawn2', '100', ''),('delacct', '200', ''),('deletegraveyard', '200', ''),('delpetition', '80', ''),('depop', '100', ''),('depopzone', '100', ''),('details', '80', ''),('disablerecipe', '80', ''),('disarmtrap', '0', ''),('distance', '80', ''),('doanim', '50', ''),('emote', '150', ''),('emotesearch', '80', ''),('emoteview', '80', ''),('enablerecipe', '80', ''),('equipitem', '50', ''),('face', '80', ''),('findnpctype', '90', 'fn'),('findspell', '90', 'fs|spfind'),('findzone', '1', 'fz'),('fixmob', '150', ''),('flag', '201', ''),('flagedit', '150', ''),('flags', '80', ''),('flymode', '80', ''),('fov', '80', ''),('freeze', '100', ''),('gassign', '150', ''),('gender', '90', ''),('getplayerburiedcorpsecount', '100', ''),('getvariable', '200', ''),('ginfo', '20', ''),('giveitem', '150', 'gi'),('givemoney', '150', ''),('globalview', '80', ''),('gm', '80', ''),('gmspeed', '80', ''),('goto', '80', ''),('grid', '150', ''),('guild', '80', 'guilds'),('guildapprove', '0', ''),('guildcreate', '0', ''),('guildlist', '0', ''),('hair', '80', ''),('haircolor', '80', ''),('haste', '100', ''),('hatelist', '80', ''),('heal', '100', ''),('helm', '80', ''),('help', '0', ''),('heritage', '80', ''),('heromodel', '200', 'hm'),('hideme', '80', 'gmhideme'),('hotfix', '250', ''),('hp', '90', ''),('incstat', '200', ''),('instance', '80', ''),('interrogateinv', '0', ''),('interrupt', '50', ''),('invsnapshot', '80', ''),('invul', '80', 'invulnerable'),('ipban', '201', ''),('iplookup', '200', ''),('iteminfo', '10', ''),('itemsearch', '90', 'fi|finditem|search'),('kick', '80', ''),('kill', '80', ''),('lastname', '80', ''),('level', '150', ''),('listnpcs', '90', ''),('listpetition', '80', ''),('load_shared_memory', '250', ''),('loc', '0', ''),('lock', '200', ''),('logs', '250', ''),('logtest', '250', ''),('makepet', '150', ''),('mana', '100', ''),('maxskills', '90', ''),('memspell', '100', ''),('merchant_close_shop', '100', 'close_shop'),('merchant_open_shop', '100', 'open_shop'),('modifynpcstat', '150', ''),('motd', '200', ''),('movechar', '80', ''),('myskills', '0', ''),('mysqltest', '250', ''),('mysql', '255', ''),('mystats', '50', ''),('name', '100', ''),('netstats', '200', ''),('npccast', '90', ''),('npcedit', '150', ''),('npcemote', '80', ''),('npcloot', '150', ''),('npcsay', '80', ''),('npcshout', '90', ''),('npcspawn', '100', ''),('npcspecialattk', '150', 'npcspecialatk|npcspecialattack'),('npcstats', '90', ''),('npctype_cache', '250', ''),('npctypespawn', '90', 'dbspawn'),('nukebuffs', '100', ''),('nukeitem', '150', ''),('object', '100', ''),('oocmute', '200', ''),('opcode', '250', ''),('path', '200', ''),('peekinv', '80', ''),('peqzone', '2', ''),('permaclass', '150', ''),('permagender', '150', ''),('permarace', '150', ''),('petitioninfo', '20', ''),('pf', '0', ''),('picklock', '0', ''),('pvp', '80', ''),('qglobal', '150', ''),('questerrors', '0', ''),('race', '90', ''),('raidloot', '0', ''),('randomfeatures', '90', ''),('refreshgroup', '0', ''),('reloadaa', '200', ''),('reloadallrules', '80', ''),('reloademote', '80', ''),('reloadlevelmods', '255', ''),('reloadperlexportsettings', '255', ''),('reloadqst', '80', 'reloadquest|rq'),('reloadrulesworld', '80', ''),('reloadstatic', '150', ''),('reloadtitles', '150', ''),('reloadworld', '255', ''),('reloadzps', '150', 'reloadzonepoints'),('repop', '90', ''),('repopclose', '100', ''),('resetaa', '100', ''),('resetaa_timer', '200', ''),('revoke', '80', ''),('rules', '200', ''),('save', '80', ''),('scribespell', '90', ''),('scribespells', '100', ''),('sendzonespawns', '200', ''),('sensetrap', '0', ''),('serverinfo', '201', ''),('serverrules', '90', ''),('setaapts', '100', 'setaapoints'),('setaaxp', '100', 'setaaexp'),('setadventurepoints', '200', ''),('setanim', '200', ''),('setcrystals', '100', ''),('setfaction', '170', ''),('setgraveyard', '200', ''),('setlanguage', '50', ''),('setlsinfo', '0', ''),('setpass', '150', ''),('setpvppoints', '100', ''),('setskill', '90', ''),('setskillall', '100', 'setallskill|setallskills'),('setstartzone', '80', ''),('setstat', '255', ''),('setxp', '100', 'setexp'),('showbonusstats', '50', ''),('showbuffs', '80', ''),('shownumhits', '0', ''),('showskills', '50', ''),('showspellslist', '100', ''),('showstats', '80', ''),('shutdown', '200', ''),('size', '90', ''),('spawn', '150', ''),('spawnfix', '80', ''),('spawnstatus', '150', ''),('spellinfo', '10', ''),('spoff', '0', ''),('spon', '0', ''),('stun', '100', ''),('summon', '80', ''),('summonburiedplayercorpse', '100', ''),('summonitem', '150', 'si'),('suspend', '100', ''),('task', '150', ''),('tattoo', '80', ''),('tempname', '100', ''),('texture', '150', ''),('time', '90', ''),('timers', '200', ''),('timezone', '90', ''),('title', '100', ''),('titlesuffix', '50', ''),('traindisc', '100', ''),('tune', '100', ''),('undyeme', '0', ''),('unfreeze', '100', ''),('unlock', '150', ''),('unscribespell', '90', ''),('unscribespells', '100', ''),('untraindisc', '180', ''),('untraindiscs', '180', ''),('uptime', '10', ''),('version', '0', ''),('viewnpctype', '100', ''),('viewpetition', '80', ''),('wc', '200', ''),('weather', '90', ''),('worldshutdown', '200', ''),('wp', '150', ''),('wpadd', '150', ''),('wpinfo', '150', ''),('xtargets', '250', ''),('zclip', '150', ''),('zcolor', '150', ''),('zheader', '150', ''),('zone', '80', ''),('zonebootup', '100', ''),('zoneinstance', '80', ''),('zonelock', '200', ''),('zoneshutdown', '200', ''),('zonespawn', '250', ''),('zonestatus', '150', ''),('zopp', '250', ''),('zsafecoords', '150', ''),('zsave', '200', ''),	('zsky', '150', ''),('zstats', '80', ''),('zunderworld', '80', ''),('zuwcoords', '80', '');
 
 )",
 	},
@@ -7206,6 +7206,274 @@ ALTER TABLE `character_parcels_containers`
 	ADD COLUMN `evolve_amount` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `quantity`;
 )",
 		.content_schema_update = false
+	},
+	ManifestEntry{
+		.version = 9329,
+		.description = "2026_07_28_achievement_content.sql",
+		.check = "SELECT 1",
+		.condition = "not_empty",
+		.match = "",
+		.sql = R"SQL(
+-- Achievement definitions and selectable reward metadata.
+
+CREATE TABLE IF NOT EXISTS `achievement_categories` (
+	`id` INT(10) UNSIGNED NOT NULL,
+	`parent_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`name` VARCHAR(255) NOT NULL DEFAULT '',
+	`description` TEXT NOT NULL,
+	`icon` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `achievements` (
+	`id` INT(10) UNSIGNED NOT NULL,
+	`name` VARCHAR(255) NOT NULL DEFAULT '',
+	`description` TEXT NOT NULL,
+	`icon_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`points` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`has_reward` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+	`client_flag` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`version` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`reset_on_version_change` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `achievement_category_associations` (
+	`category_id` INT(10) UNSIGNED NOT NULL,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`display_text` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`category_id`, `achievement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `achievement_components` (
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`component_type` TINYINT(3) UNSIGNED NOT NULL,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`component_id` INT(10) UNSIGNED NOT NULL,
+	`name` TEXT NOT NULL,
+	`description` TEXT NOT NULL,
+	PRIMARY KEY (`achievement_id`, `component_type`, `component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `achievement_associations` (
+	`component_id` INT(10) UNSIGNED NOT NULL,
+	`required_count` INT(10) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Server-authored event bindings. Numeric enum values are defined in
+-- common/achievements.h and are intentionally not constrained by SQL ENUMs.
+CREATE TABLE IF NOT EXISTS `achievement_criteria` (
+	`id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`component_type` TINYINT(3) UNSIGNED NOT NULL,
+	`component_sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`component_id` INT(10) UNSIGNED NOT NULL,
+	`event_type` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`progress_mode` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`behavior` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`target_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`target_id2` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`target_value` BIGINT(20) NOT NULL DEFAULT 0,
+	`required_count` INT(10) UNSIGNED NOT NULL DEFAULT 1,
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `achievement_criteria_definition` (`achievement_id`, `component_type`, `component_id`, `event_type`, `target_id`, `target_id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- All rows for one restriction_id must pass.
+CREATE TABLE IF NOT EXISTS `achievement_cast_requirements` (
+	`restriction_id` INT(10) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`requires_completed` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`restriction_id`, `achievement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Reward definitions are provider-independent. reward_sources links a
+-- selectable set to an achievement, task, or future source. Automatic rewards
+-- use reward_source_entries instead.
+CREATE TABLE IF NOT EXISTS `reward_sets` (
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`title` VARCHAR(255) NOT NULL DEFAULT '',
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`reward_set_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `reward_options` (
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`option_id` INT(10) UNSIGNED NOT NULL,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`label` VARCHAR(255) NOT NULL DEFAULT '',
+	`common_to_all` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+	`flags` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`reward_set_id`, `option_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `rewards` (
+	`reward_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`reward_type` TINYINT(3) UNSIGNED NOT NULL,
+	`reward_data_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`amount` BIGINT(20) UNSIGNED NOT NULL DEFAULT 1,
+	`description` VARCHAR(255) NOT NULL DEFAULT '',
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`reward_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `reward_option_entries` (
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`option_id` INT(10) UNSIGNED NOT NULL,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`reward_id` INT(10) UNSIGNED NOT NULL,
+	PRIMARY KEY (`reward_set_id`, `option_id`, `reward_id`),
+	UNIQUE KEY `reward_option_entries_set_reward` (`reward_set_id`, `reward_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `reward_sources` (
+	`source_type` TINYINT(3) UNSIGNED NOT NULL,
+	`source_id` BIGINT(20) UNSIGNED NOT NULL,
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`enabled` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+	PRIMARY KEY (`source_type`, `source_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `reward_source_entries` (
+	`source_type` TINYINT(3) UNSIGNED NOT NULL,
+	`source_id` BIGINT(20) UNSIGNED NOT NULL,
+	`sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`reward_id` INT(10) UNSIGNED NOT NULL,
+	PRIMARY KEY (`source_type`, `source_id`, `reward_id`),
+	UNIQUE KEY `reward_source_entries_source_sequence` (`source_type`, `source_id`, `sequence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)SQL",
+		.content_schema_update = true
+	},
+	ManifestEntry{
+		.version = 9330,
+		.description = "2026_07_28_achievement_state.sql",
+		.check = "SELECT 1",
+		.condition = "not_empty",
+		.match = "",
+		.sql = R"SQL(
+-- Character achievement state, reward delivery state, and queued state updates.
+
+CREATE TABLE IF NOT EXISTS `character_achievements` (
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`version` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`completed_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY (`character_id`, `achievement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `character_achievement_progress` (
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`component_type` TINYINT(3) UNSIGNED NOT NULL,
+	`component_sequence` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`component_id` INT(10) UNSIGNED NOT NULL,
+	`current_count` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+	`completed` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
+	`version` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`updated_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY (`character_id`, `achievement_id`, `component_type`, `component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- status: 0=claimed/in-flight, 1=granted, 2=explicit delivery failure.
+CREATE TABLE IF NOT EXISTS `character_achievement_rewards` (
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`reward_id` BIGINT(20) UNSIGNED NOT NULL,
+	`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`attempt_count` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`granted_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_attempt_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_error` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`character_id`, `achievement_id`, `reward_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- status: 0=pending/in progress, 1=fully granted, 2=retryable failure,
+-- 3=ambiguous delivery.
+CREATE TABLE IF NOT EXISTS `character_achievement_reward_selections` (
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`selected_option_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`attempt_count` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`claimed_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_attempt_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_error` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`character_id`, `achievement_id`, `reward_set_id`),
+	KEY `character_achievement_reward_selections_status` (`status`, `character_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `character_task_reward_instances` (
+	`occurrence_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`task_id` INT(10) UNSIGNED NOT NULL,
+	`accepted_time` INT(10) UNSIGNED NOT NULL,
+	PRIMARY KEY (`occurrence_id`),
+	UNIQUE KEY `character_task_reward_instances_source` (`character_id`, `task_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- status: 0=pending/in progress, 1=fully granted, 2=retryable failure,
+-- 3=ambiguous delivery.
+CREATE TABLE IF NOT EXISTS `character_task_reward_selections` (
+	`pending_reward_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`task_id` INT(10) UNSIGNED NOT NULL,
+	`accepted_time` INT(10) UNSIGNED NOT NULL,
+	`source_instance_id` BIGINT(20) UNSIGNED NOT NULL,
+	`reward_set_id` INT(10) UNSIGNED NOT NULL,
+	`selected_option_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`attempt_count` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`claimed_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_attempt_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_error` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`pending_reward_id`),
+	UNIQUE KEY `character_task_reward_selections_source` (`character_id`, `source_instance_id`),
+	KEY `character_task_reward_selections_status` (`status`, `character_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `character_task_rewards` (
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`pending_reward_id` INT(10) UNSIGNED NOT NULL,
+	`reward_id` BIGINT(20) UNSIGNED NOT NULL,
+	`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`attempt_count` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`granted_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_attempt_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_error` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`pending_reward_id`, `reward_id`),
+	KEY `character_task_rewards_character` (`character_id`, `pending_reward_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- status: 0=pending, 1=blocked, 2=processing under a bounded lease.
+CREATE TABLE IF NOT EXISTS `character_achievement_pending_updates` (
+	`update_id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`character_id` INT(10) UNSIGNED NOT NULL,
+	`source_target_type` TINYINT(3) UNSIGNED NOT NULL,
+	`source_target_id` BIGINT(20) UNSIGNED NOT NULL,
+	`operation` TINYINT(3) UNSIGNED NOT NULL,
+	`achievement_id` INT(10) UNSIGNED NOT NULL,
+	`component_type` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`component_id` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`requested_value` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`version` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`status` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+	`attempt_count` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`created_at` INT(10) UNSIGNED NOT NULL,
+	`last_attempt_at` INT(10) UNSIGNED NOT NULL DEFAULT 0,
+	`last_error` VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (`update_id`),
+	KEY `character_achievement_updates_character` (`character_id`, `status`, `update_id`),
+	KEY `character_achievement_updates_status` (`status`, `character_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+)SQL"
 	},
 // -- template; copy/paste this when you need to create a new entry
 //	ManifestEntry{

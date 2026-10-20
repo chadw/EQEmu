@@ -18,6 +18,7 @@
 #include "shared_task_manager.h"
 
 #include "common/repositories/character_data_repository.h"
+#include "common/repositories/character_activities_repository.h"
 #include "common/repositories/character_task_timers_repository.h"
 #include "common/repositories/completed_shared_task_activity_state_repository.h"
 #include "common/repositories/completed_shared_task_members_repository.h"

@@ -1909,6 +1909,7 @@ enum GuildInformationActions
 {
     GuildUpdateURL          = 0,
     GuildUpdateChannel      = 1,
+    GuildUpdateAchievement  = 3,
     GuildUpdateRanks        = 4,
     GuildUpdatePermissions  = 5
 };

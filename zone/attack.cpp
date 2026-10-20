@@ -15,7 +15,9 @@
 	You should have received a copy of the GNU General Public License
 	along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "common/data_verification.h"
+#include "common/achievements.h"
 #include "common/eq_constants.h"
 #include "common/eq_packet_structs.h"
 #include "common/events/player_event_logs.h"
@@ -2475,6 +2477,9 @@ void NPC::Damage(Mob* other, int64 damage, uint16 spell_id, EQ::skills::SkillTyp
 
 bool NPC::Death(Mob* killer_mob, int64 damage, uint16 spell, EQ::skills::SkillType attack_skill, KilledByTypes killed_by, bool is_buff_tic)
 {
+	const auto achievement_npc_name_identity =
+		EQ::Achievements::NpcNameIdentityHash(GetOrigName());
+
 	LogCombat(
 		"Fatal blow dealt by [{}] with [{}] damage, spell [{}], skill [{}]",
 		(killer_mob ? killer_mob->GetName() : "[nullptr]"),
@@ -2990,8 +2995,15 @@ bool NPC::Death(Mob* killer_mob, int64 damage, uint16 spell, EQ::skills::SkillTy
 
 	if (give_exp_client && !IsCorpse()) {
 		const auto& v = give_exp_client->GetRaidOrGroupOrSelf(true);
+		const auto base_zone_id = zone ? zone->GetZoneID() : 0;
 		for (const auto& m : v) {
 			m->CastToClient()->RecordKilledNPCEvent(this);
+			m->CastToClient()->UpdateAchievementForKill(
+				GetNPCTypeID(),
+				GetBaseRace(),
+				achievement_npc_name_identity,
+				base_zone_id
+			);
 
 			if (parse->HasQuestSub(GetNPCTypeID(), EVENT_KILLED_MERIT)) {
 				parse->EventNPC(EVENT_KILLED_MERIT, this, m, "killed", 0);
@@ -3196,7 +3208,11 @@ void Mob::AddToHateList(Mob* other, int64 hate /*= 0*/, int64 damage /*= 0*/, bo
 
 	// if other is a bot, add the bots client to the hate list
 	if (RuleB(Bots, Enabled)) {
-		 if (other->IsBot()) {
+		if (other->GetOwner() && other->GetOwner()->IsBot()) {
+			other = other->GetOwner();
+		}
+
+		if (other->IsBot()) {
 			auto other_ = other->CastToBot();
 
 			if (!other_ || !other_->GetBotOwner()) {
