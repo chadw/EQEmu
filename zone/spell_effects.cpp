@@ -828,7 +828,7 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 				// Make charmed pet parser friendly
 				if (caster) {
 					char pet_name[64];
-					snprintf(pet_name, sizeof(pet_name), "%s`s Charmed Pet", caster->GetCleanName());
+					snprintf(pet_name, sizeof(pet_name), "%s`s_Charmed_Pet", caster->GetCleanName());
 					TempName(pet_name);
 				}
 
