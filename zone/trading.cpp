@@ -534,6 +534,9 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 		}
 
 		if (!quest_npc) {
+			std::vector<PlayerEvent::HandinEntry> pet_handin_items;
+			NPC *pet_handin_npc = nullptr;
+
 			for (auto &inst: items) {
 				if (!inst || !inst->GetItem()) {
 					continue;
@@ -552,6 +555,32 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 				const EQ::ItemData *item  = inst->GetItem();
 				const bool         is_pet = with->IsPetOwnerOfClientBot() || with->IsCharmedPet();
 				if (is_pet && with->CanPetTakeItem(inst)) {
+					// Log accepted pet items using the existing NPC_HANDIN event.
+					auto log_pet_item_transfer = [this, with, &pet_handin_items, &pet_handin_npc](
+						const EQ::ItemInstance *pet_item
+					) {
+						if (!pet_item || !pet_item->GetItem()) {
+							return;
+						}
+
+						if (!PlayerEventLogs::Instance()->IsEventEnabled(PlayerEvent::NPC_HANDIN)) {
+							return;
+						}
+
+						pet_handin_npc = with;
+
+						pet_handin_items.emplace_back(PlayerEvent::HandinEntry{
+							.item_id = pet_item->GetID(),
+							.item_name = pet_item->GetItem()->Name,
+							.augment_ids = pet_item->GetAugmentIDs(),
+							.augment_names = pet_item->GetAugmentNames(),
+							.charges = std::max(
+								static_cast<uint16>(pet_item->GetCharges()),
+								static_cast<uint16>(1)
+							)
+						});
+					};
+
 					// pets need to look inside bags and try to equip items found there
 					if (item->IsClassBag() && item->BagSlots > 0) {
 						// if an item inside the bag can't be given to the pet, keep the bag
@@ -570,6 +599,7 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 								lde.equip_item   = 1;
 								lde.item_charges = static_cast<int8>(baginst->GetCharges());
 								with->AddLootDrop(baginst->GetItem(), lde, true);
+								log_pet_item_transfer(baginst);
 								inst->DeleteItem(bslot);
 								item_count++;
 							}
@@ -584,6 +614,7 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 							lde.equip_item   = 1;
 							lde.item_charges = static_cast<int8>(inst->GetCharges());
 							with->AddLootDrop(item, lde, true);
+							log_pet_item_transfer(inst);
 							inst = nullptr;
 						}
 					}
@@ -593,10 +624,23 @@ void Client::FinishTrade(Mob* tradingWith, bool finalizer, void* event_entry, st
 						lde.equip_item   = 1;
 						lde.item_charges = static_cast<int8>(inst->GetCharges());
 						with->AddLootDrop(item, lde, true);
+						log_pet_item_transfer(inst);
 						inst = nullptr;
 					}
 				}
 			}
+
+			if (!pet_handin_items.empty() && pet_handin_npc) {
+				auto e = PlayerEvent::HandinEvent{
+					.npc_id = pet_handin_npc->GetNPCTypeID(),
+					.npc_name = pet_handin_npc->GetCleanName(),
+					.handin_items = pet_handin_items,
+					.is_quest_handin = false
+				};
+
+				RecordPlayerEventLogWithClient(this, PlayerEvent::NPC_HANDIN, e);
+			}
+
 		}
 
 		std::string currencies[] = {"copper", "silver", "gold", "platinum"};
@@ -2060,7 +2104,7 @@ static void UpdateTraderCustomerPriceChanged(
 void Client::SendBuyerResults(BarterSearchRequest_Struct& bsr)
 {
 	if (ClientVersion() >= EQ::versions::ClientVersion::RoF) {
-		std::string search_string(bsr.search_string);
+		std::string search_string(bsr.search_string, strnlen(bsr.search_string, sizeof(bsr.search_string)));
 		BuyerLineSearch_Struct results{};
 
 		SetBarterTime();
@@ -4016,7 +4060,7 @@ void Client::SendBuyerGreeting(uint32 buyer_id)
 		Message(Chat::White, "Welcome!");
 		return;
 	}
-	Message(Chat::White, buyer.front().welcome_message.c_str());
+	Message(Chat::White, "%s", buyer.front().welcome_message.c_str());
 }
 
 void Client::SendSellerBrowsing(const std::string &browser)

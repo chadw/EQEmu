@@ -4226,7 +4226,12 @@ void Client::Handle_OP_Barter(const EQApplicationPacket *app)
 	}
 
 	case Barter_WelcomeMessageUpdate: {
+		if (app->size < sizeof(BuyerWelcomeMessageUpdate_Struct)) {
+			break;
+		}
+
 		auto bwmu = (BuyerWelcomeMessageUpdate_Struct *) app->pBuffer;
+		bwmu->welcome_message[sizeof(bwmu->welcome_message) - 1] = '\0';
 		SetBuyerWelcomeMessage(bwmu->welcome_message);
 		break;
 	}
@@ -14944,8 +14949,24 @@ void Client::Handle_OP_ShopPlayerSell(const EQApplicationPacket *app)
 		}
 	}
 
+	// paying more than the merchant charges for the same quantity would be a money loop
+	uint64 buy_unit_price = (item->Price * item->SellRate);
+	if (!RuleB(Merchant, UseClassicPriceMod)) {
+		buy_unit_price *= RuleR(Merchant, SellCostMod);
+	}
+
+	if (RuleB(Merchant, UsePriceMod)) {
+		buy_unit_price *= Client::CalcPriceMod(vendor, false);
+	}
+
+	const uint64 buy_back_cap = buy_unit_price * cost_quantity;
+	if (price > buy_back_cap) {
+		price = static_cast<uint32>(buy_back_cap);
+	}
+
 	AddMoneyToPP(price);
 
+	// Update merchant stock and refresh client
 	if (inst->IsStackable() || inst->IsCharged())
 	{
 		unsigned int i_quan = inst->GetCharges();
@@ -17790,11 +17811,14 @@ void Client::Handle_OP_GuildTributeDonatePlat(const EQApplicationPacket *app)
 	auto favor = quantity * RuleI(Guild, TributePlatConversionRate);
 	auto guild = guild_mgr.GetGuildByGuildID(guild_id);
 	if (guild) {
+		if (quantity == 0 || !TakePlatinum(quantity, false)) {
+			return;
+		}
+
 		guild->tribute.favor += favor;
 		guild_mgr.UpdateDbGuildFavor(GuildID(), guild->tribute.favor);
 		auto member_favor = guild_mgr.UpdateDbMemberFavor(GuildID(), CharacterID(), favor);
 
-		TakePlatinum(quantity, false);
 		SendGuildTributeDonatePlatReply(in, favor);
 
 		if(PlayerEventLogs::Instance()->IsEventEnabled(PlayerEvent::GUILD_TRIBUTE_DONATE_PLAT)) {
