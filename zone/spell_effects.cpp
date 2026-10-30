@@ -826,7 +826,7 @@ bool Mob::SpellEffect(Mob* caster, uint16 spell_id, float partial, int level_ove
 				SetPetType(PetType::Charmed);
 
 				// Make charmed pet parser friendly
-				if (caster) {
+				if (IsNPC() && caster->IsClient()) {
 					char pet_name[64];
 					snprintf(pet_name, sizeof(pet_name), "%s`s_Charmed_Pet", caster->GetCleanName());
 					TempName(pet_name);
@@ -4485,8 +4485,10 @@ void Mob::BuffFadeBySlot(int slot, bool iRecalcBonuses)
 					owner->SetPet(0);
 				}
 
-				// revert to original name
-				TempName();
+				if (IsNPC()) {
+					// revert to original name
+					TempName();
+				}
 
 				// Any client that has a previous charmed pet targetted shouldo
 				// no longer see the buffs on the old pet.
