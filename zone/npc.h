@@ -133,6 +133,7 @@ public:
 	virtual Group* GetGroup() { return 0; }
 
 	virtual bool IsNPC() const { return true; }
+	virtual bool ShouldISpawnFor(Client *c);
 
 	virtual bool Process();
 	virtual void	AI_Init();

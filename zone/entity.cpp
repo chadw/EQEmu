@@ -702,7 +702,12 @@ void EntityList::AddNPC(NPC *npc, bool send_spawn_packet, bool dont_queue)
 		if (dont_queue) {
 			auto app = new EQApplicationPacket;
 			npc->CreateSpawnPacket(app, npc);
-			QueueClients(npc, app);
+			Mob *hidden_owner = npc->GetOwner();
+			if (hidden_owner && hidden_owner->IsClient() && hidden_owner->CastToClient()->GetHideMe()) {
+				QueueClientsStatus(npc, app, false, hidden_owner->CastToClient()->Admin(), 255);
+			} else {
+				QueueClients(npc, app);
+			}
 			npc->SendArmorAppearance();
 			npc->SetAppearance(npc->GetGuardPointAnim(), false);
 
@@ -851,8 +856,13 @@ void EntityList::CheckSpawnQueue()
 			outapp = new EQApplicationPacket;
 			ns = iterator.GetData();
 			Mob::CreateSpawnPacket(outapp, ns);
-			QueueClients(0, outapp);
 			auto it = npc_list.find(ns->spawn.spawnId);
+			Mob *hidden_owner = (it != npc_list.end()) ? it->second->GetOwner() : nullptr;
+			if (hidden_owner && hidden_owner->IsClient() && hidden_owner->CastToClient()->GetHideMe()) {
+				QueueClientsStatus(nullptr, outapp, false, hidden_owner->CastToClient()->Admin(), 255);
+			} else {
+				QueueClients(0, outapp);
+			}
 			if (it == npc_list.end()) {
 				// We must of despawned, hope that's the reason!
 				LogError("Error in EntityList::CheckSpawnQueue: Unable to find NPC for spawnId [{}]", ns->spawn.spawnId);

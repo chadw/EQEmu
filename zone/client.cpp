@@ -4134,6 +4134,18 @@ void Client::SetHideMe(bool flag)
 	}
 
 	entity_list.QueueClientsStatus(this, &app, true, 0, Admin() - 1);
+
+	Mob *pet = GetPet();
+	if (pet && pet->IsNPC()) {
+		EQApplicationPacket pet_app;
+		if (gm_hide_me) {
+			pet->CreateDespawnPacket(&pet_app, false);
+		} else {
+			pet->CreateSpawnPacket(&pet_app);
+		}
+		entity_list.QueueClientsStatus(this, &pet_app, true, 0, Admin() - 1);
+	}
+
 	UpdateWho();
 }
 

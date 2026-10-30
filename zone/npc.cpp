@@ -2172,6 +2172,12 @@ bool Mob::HasNPCSpecialAtk(const char* parse) {
 	return HasAllAttacks;
 }
 
+bool NPC::ShouldISpawnFor(Client *c)
+{
+	Mob *owner = GetOwner();
+	return !(owner && owner->IsClient() && owner->CastToClient()->GMHideMe(c));
+}
+
 void NPC::FillSpawnStruct(NewSpawn_Struct* ns, Mob* ForWho)
 {
 	Mob::FillSpawnStruct(ns, ForWho);
