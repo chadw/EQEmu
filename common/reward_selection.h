@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef EQEMU_COMMON_REWARD_SELECTION_H
+#define EQEMU_COMMON_REWARD_SELECTION_H
 
 #include <cstdint>
 #include <string>
@@ -63,3 +64,5 @@ enum class Action : uint32_t {
 };
 
 } // namespace EQ::RewardSelection
+
+#endif // EQEMU_COMMON_REWARD_SELECTION_H

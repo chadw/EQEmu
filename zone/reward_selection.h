@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef EQEMU_ZONE_REWARD_SELECTION_H
+#define EQEMU_ZONE_REWARD_SELECTION_H
 
 #include "common/eq_constants.h"
 #include "common/reward_selection.h"
@@ -182,3 +183,5 @@ private:
 	ChannelState  m_claimable_channel;
 	ChannelState  m_preview_channel;
 };
+
+#endif // EQEMU_ZONE_REWARD_SELECTION_H
