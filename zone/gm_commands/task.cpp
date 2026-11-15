@@ -82,16 +82,6 @@ void command_task(Client *c, const Seperator *sep)
 			).c_str()
 		);
 
-		c->Message(Chat::White, "------------------------------------------------");
-		c->Message(Chat::White, "# Shared Task System Commands");
-		c->Message(Chat::White, "------------------------------------------------");
-		c->Message(
-			Chat::White,
-			fmt::format(
-				"--- [{}] Purges all active Shared Tasks in memory and database ",
-				Saylink::Silent("#task sharedpurge", "sharedpurge")
-			).c_str()
-		);
 		return;
 	}
 
@@ -105,7 +95,6 @@ void command_task(Client *c, const Seperator *sep)
 	const bool is_purgetimers = !strcasecmp(sep->arg[1], "purgetimers");
 	const bool is_reload      = !strcasecmp(sep->arg[1], "reload");
 	const bool is_reloadall   = !strcasecmp(sep->arg[1], "reloadall");
-	const bool is_sharedpurge = !strcasecmp(sep->arg[1], "sharedpurge");
 	const bool is_show        = !strcasecmp(sep->arg[1], "show");
 	const bool is_uncomplete  = !strcasecmp(sep->arg[1], "uncomplete");
 	const bool is_update      = !strcasecmp(sep->arg[1], "update");
@@ -116,7 +105,6 @@ void command_task(Client *c, const Seperator *sep)
 		!is_purgetimers &&
 		!is_reload &&
 		!is_reloadall &&
-		!is_sharedpurge &&
 		!is_show &&
 		!is_uncomplete &&
 		!is_update
@@ -171,16 +159,6 @@ void command_task(Client *c, const Seperator *sep)
 			).c_str()
 		);
 
-		c->Message(Chat::White, "------------------------------------------------");
-		c->Message(Chat::White, "# Shared Task System Commands");
-		c->Message(Chat::White, "------------------------------------------------");
-		c->Message(
-			Chat::White,
-			fmt::format(
-				"--- [{}] Purges all active Shared Tasks in memory and database ",
-				Saylink::Silent("#task sharedpurge", "sharedpurge")
-			).c_str()
-		);
 		return;
 	}
 
@@ -292,24 +270,6 @@ void command_task(Client *c, const Seperator *sep)
 		c->Message(Chat::White, "Attempting to reload tasks.");
 		worldserver.SendReloadTasks(RELOADTASKS);
 		c->Message(Chat::White, "Successfully reloaded tasks.");
-	} else if (is_sharedpurge) {
-		const bool is_confirm = !strcasecmp(sep->arg[2], "confirm");
-
-		if (is_confirm) {
-			LogTasksDetail("Sending purge request");
-			auto pack = new ServerPacket(ServerOP_SharedTaskPurgeAllCommand, 0);
-			worldserver.SendPacket(pack);
-			safe_delete(pack);
-			return;
-		}
-
-		c->Message(
-			Chat::White,
-			fmt::format(
-				"[WARNING] This will purge all active Shared Tasks [{}]?",
-				Saylink::Silent("#task sharedpurge confirm", "confirm")
-			).c_str()
-		);
 	} else if (is_show) {
 		t->ShowClientTasks(c);
 	} else if (is_uncomplete) {
